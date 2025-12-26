@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.9'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'SpecDriven'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.register('validateGenerated') {
+    group = 'verification'
+    description = 'Run spec validation, optional code generation script, then build and tests.'
+    doLast {
+        def script = file('tools/validate-generation.ps1')
+        if (script.exists()) {
+            println "Executing $script"
+            def proc = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script.absolutePath].execute()
+            proc.in.eachLine { println it }
+            proc.err.eachLine { System.err.println it }
+            proc.waitFor()
+            if (proc.exitValue() != 0) {
+                throw new GradleException("validate-generation.ps1 failed with exit code: ${proc.exitValue()}")
+            }
+        } else {
+            println "No validation script found at tools/validate-generation.ps1 — skipping."
+        }
+    }
+}

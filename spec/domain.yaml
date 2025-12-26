@@ -1,0 +1,15 @@
+entities:
+  Item:
+    description: "A purchasable item"
+    fields:
+      id:
+        type: uuid
+        description: "Unique identifier"
+      name:
+        type: string
+        description: "Display name"
+      price:
+        type: number
+        format: decimal
+        description: "Monetary value"
+

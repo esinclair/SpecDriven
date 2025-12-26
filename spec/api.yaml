@@ -1,0 +1,32 @@
+openapi: 3.0.3
+info:
+  title: SpecDriven API (partial)
+  version: 1.0.0
+paths:
+  /items:
+    post:
+      summary: Create an Item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '201':
+          description: Created
+components:
+  schemas:
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        price:
+          type: number
+          format: decimal
+      required: [name, price]
+
