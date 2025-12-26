@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.9'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.openapi.generator' version '7.14.0'
 }
 
 group = 'com.example'
@@ -20,8 +21,56 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Optional but handy if you later want to serve docs at runtime
+    // implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// OpenAPI-first: generate Spring interfaces/DTOs from the spec
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
+def openApiSpec = "$rootDir/src/main/resources/openapi.yaml"
+
+tasks.named('openApiGenerate', GenerateTask) {
+    // ensure deterministic generation (build should be reproducible)
+    inputSpec.set(openApiSpec)
+    generatorName.set('spring')
+    outputDir.set("${layout.buildDirectory.get().asFile}/generated/openapi")
+
+    apiPackage.set('com.example.specdriven.api')
+    modelPackage.set('com.example.specdriven.api.model')
+    invokerPackage.set('com.example.specdriven.api.invoker')
+
+    // Generate interfaces only; we implement controllers ourselves.
+    configOptions.set([
+            interfaceOnly         : 'true',
+            useSpringBoot3        : 'true',
+            useJakartaEe          : 'true',
+            openApiNullable       : 'false',
+            documentationProvider : 'none',
+            dateLibrary           : 'java8',
+            serializableModel     : 'true'
+    ])
+}
+
+def generatedOpenApiSrcDir = "${layout.buildDirectory.get().asFile}/generated/openapi/src/main/java"
+
+sourceSets {
+    main {
+        java {
+            srcDir generatedOpenApiSrcDir
+        }
+    }
+}
+
+// Ensure generation runs before compilation
+tasks.named('compileJava') {
+    dependsOn tasks.named('openApiGenerate')
 }
 
 tasks.named('test') {

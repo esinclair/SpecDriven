@@ -17,21 +17,27 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Language/Version**: [e.g., Java 21 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., Spring Boot, Spring Web, Validation or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, files or N/A]  
+**Testing**: [e.g., JUnit 5, Spring Boot Test, Mockito or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, containers or NEEDS CLARIFICATION]
 **Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Performance Goals**: [domain-specific, e.g., <1s request→response for primary path]  
+**Constraints**: [domain-specific, e.g., error codes are stable and retry semantics are conveyed by HTTP status + standard headers]  
+**Scale/Scope**: [domain-specific]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- Tests are mandatory: plan includes unit + integration tests for happy paths AND exception/
+  alternative flows.
+- Performance budget: identify any synchronous paths and how they will meet the ≤1s response goal
+  (or explicitly redesign as async/paginated/etc.).
+- Error contract: plan defines error response shape with clear `code` values and correct HTTP status
+  semantics (including retry guidance via standard headers like `Retry-After` when applicable).
+- Build gate: plan assumes `./gradlew test` is the minimum green gate on a clean checkout.
 
 ## Project Structure
 
