@@ -11,6 +11,18 @@
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
   you should still have a viable MVP (Minimum Viable Product) that delivers value.
+
+  In this repo, include BOTH:
+  - Positive scenarios (happy path)
+  - Negative scenarios (invalid inputs, error responses, exception paths)
+
+  Retryability semantics MUST be expressed via HTTP status codes and standard headers (e.g., Retry-After),
+  NOT via any "retryable" request/response field.
+
+  Public APIs MUST be unversioned and backward compatible:
+  - No `/v1` in paths, and no versioning via headers/query params/media types.
+  - Breaking changes are NOT allowed (e.g., adding new REQUIRED inputs). Only additive changes are
+    allowed: new OPTIONAL inputs and/or additional output fields.
   
   Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
   Think of each story as a standalone slice of functionality that can be:
@@ -33,6 +45,12 @@
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
 2. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
+**Negative/Error Scenarios**:
+
+1. **Given** [invalid input], **When** [action], **Then** response is **4xx** with correct error body + stable error `code`
+2. **Given** [missing resource/conflict], **When** [action], **Then** response is **4xx** with correct error `code`
+3. **Given** [transient server/upstream failure], **When** [action], **Then** response is **5xx/503** with correct error `code`
+
 ---
 
 ### User Story 2 - [Brief Title] (Priority: P2)
@@ -46,6 +64,10 @@
 **Acceptance Scenarios**:
 
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+
+**Negative/Error Scenarios**:
+
+1. **Given** [invalid input], **When** [action], **Then** response is **4xx** with correct error `code`
 
 ---
 
@@ -61,6 +83,10 @@
 
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
+**Negative/Error Scenarios**:
+
+1. **Given** [invalid input], **When** [action], **Then** response is **4xx** with correct error `code`
+
 ---
 
 [Add more user stories as needed, each with an assigned priority]
@@ -74,6 +100,7 @@
 
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
+- How does the API convey retryability via HTTP status (4xx vs 5xx/503) for [this failure]?
 
 ## Requirements *(mandatory)*
 
