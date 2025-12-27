@@ -69,9 +69,25 @@ tasks.named('openApiGenerate', GenerateTask) {
             serializableModel     : 'true'
     ])
 
+    // Generate ONLY Java sources; do not emit ancillary supporting files like README, pom.xml,
+    // .openapi-generator metadata (FILES/VERSION), or .openapi-generator-ignore.
+    globalProperties.set([
+            // Ensure Java types/interfaces are generated
+            apis           : '',
+            models         : '',
+            // But do not emit ancillary supporting files like README, pom.xml, .openapi-generator metadata, etc.
+            supportingFiles: 'false'
+    ])
+
     // Writing generated sources under the project directory can confuse Gradle's output snapshotting on Windows.
     // This task is deterministic and already wired into compilation, so we disable state tracking.
     doNotTrackState("Generates sources into src/main-gen (inside the project dir)")
+
+    // OpenAPI Generator still writes some metadata/ignore files even when supportingFiles=false.
+    // Remove them to keep the workspace clean.
+    doLast {
+        delete file("$rootDir/.openapi-generator"), file("$rootDir/.openapi-generator-ignore")
+    }
 }
 
 
