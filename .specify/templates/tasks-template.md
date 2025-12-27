@@ -12,6 +12,15 @@ description: "Task list template for feature implementation"
 negative/error flows (invalid inputs, error responses, exception paths), aligned with the OpenAPI
 contract and HTTP status semantics.
 
+**Feature flags (mandatory for new features / non-trivial behavior changes)**: Tasks MUST include
+implementing a Spring boolean property flag named `FeatureFlag.<featureName>` to gate the behavior
+(`true` enables, `false` disables), documenting the default value, and adding tests for both enabled
+and disabled modes where feasible.
+
+**Paged results (mandatory)**: If any endpoint may return more than one item, tasks MUST include
+paged response shape + required pagination inputs in OpenAPI, plus tests for paging boundaries
+(empty page, last page, max page size).
+
 **Public API compatibility (mandatory)**: Tasks MUST NOT introduce explicit API versioning (no `/v1`,
 headers, query params, or media type versioning). If changing an existing operation, tasks MUST
 preserve backward compatibility (no new required inputs). Only additive optional inputs and/or
@@ -42,6 +51,7 @@ additive outputs are allowed.
   - Entities from data-model.md
   - Endpoints from contracts/
   - Constitution requirements (tests mandatory, error status semantics, OpenAPI-first)
+  - Feature flagging requirements (new features gated by `FeatureFlag.<featureName>`, tests for both modes)
   
   Tasks MUST be organized by user story so each story can be:
   - Implemented independently
@@ -76,6 +86,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T007 Create base models/entities that all stories depend on
 - [ ] T008 Configure error handling and logging infrastructure (stable error codes + HTTP status semantics)
 - [ ] T009 Setup environment configuration management
+- [ ] T009a [P] Implement feature-flag wiring for this feature (`FeatureFlag.<featureName>`) with explicit default
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -95,6 +106,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T011 [P] \[US1\] Integration test(s): happy path
 - [ ] T012 [P] \[US1\] Negative test(s): invalid input → correct 4xx + error `code`
 - [ ] T013 [P] \[US1\] Negative test(s): expected server/upstream failure → correct 5xx/503 + error `code` (retryable via status)
+- [ ] T013a [P] \[US1\] Feature-flag test(s): verify behavior with `FeatureFlag.<featureName>=true` vs `false` (if applicable)
 
 ### Implementation for User Story 1
 

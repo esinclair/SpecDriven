@@ -26,6 +26,14 @@
 - [ ] CHK000 Existing operations remain backward compatible (no new REQUIRED request inputs)
 - [ ] CHK000 Any request additions are OPTIONAL with sensible defaults (no behavior change if omitted)
 - [ ] CHK000 Response changes are additive only (only additional fields) and clients can ignore them
+- [ ] CHK000 Any endpoint that may return multiple items uses a paged result set (no unbounded list/array responses)
+
+## Feature Flags (if applicable)
+
+- [ ] CHK000 New feature/non-trivial behavior change is gated by `FeatureFlag.<featureName>` (Spring boolean property)
+- [ ] CHK000 Flag semantics are correct: `true` enables, `false` disables
+- [ ] CHK000 Default value is explicit and documented (spec/plan) and matches implementation
+- [ ] CHK000 Tests cover both enabled and disabled modes where feasible
 
 ## [Category 1]
 

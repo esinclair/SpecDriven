@@ -1,10 +1,10 @@
 <!--
 Sync Impact Report
-- Version change: 1.1.0 → 1.2.0
+- Version change: 1.3.0 → 1.4.0
 - Modified principles:
-  - None (existing principles retained)
+  - 5) Spring Boot & Gradle Consistency → 5) Spring Boot & Gradle Consistency (expanded: feature flags via Spring properties)
 - Added sections:
-  - Core Principles: 6) Public API Compatibility: No Versioning + No Breaking Changes
+  - Core Principles: 8) Feature Flags (Spring Properties)
 - Removed sections: None
 - Templates requiring updates:
   - ✅ F:/data/dev/SpecDriven/.specify/templates/plan-template.md
@@ -12,7 +12,7 @@ Sync Impact Report
   - ✅ F:/data/dev/SpecDriven/.specify/templates/tasks-template.md
   - ✅ F:/data/dev/SpecDriven/.specify/templates/checklist-template.md
 - Follow-up TODOs:
-  - TODO(RATIFICATION_DATE): Original ratification date before 2025-12-26 is unknown.
+  - TODO(RATIFICATION_DATE): Original ratification date is unknown.
 -->
 
 # SpecDriven Constitution
@@ -108,6 +108,35 @@ Backward-compatible evolution is allowed ONLY when additive:
 Rationale: Clients integrate against a single stable contract. Avoiding explicit API versioning
 reduces fragmentation and forces disciplined, additive evolution.
 
+### 7) Paged Result Sets for Collections
+When an operation may return more than one item (e.g., a list/array of resources), the API MUST
+return a paged result set.
+
+- Endpoints that can return multiple items MUST accept pagination input parameters.
+- Endpoints MUST NOT return unbounded full-list responses.
+- Pagination requirements MUST be reflected in the OpenAPI contract (inputs and response shape).
+
+Rationale: Prevents unbounded response sizes, supports predictable performance, and keeps clients
+from depending on unsafe full-list behavior.
+
+### 8) Feature Flags (Spring Properties)
+New features (or non-trivial behavior changes) MUST be guarded by a feature flag so they can be
+enabled/disabled via Spring configuration.
+
+Rules:
+- Each feature flag MUST be a Spring boolean property named exactly:
+  - `FeatureFlag.<featureName>`
+- The value MUST be boolean:
+  - `true` enables the feature
+  - `false` disables the feature
+- Defaults MUST be explicit and documented in the feature spec and/or plan
+  (e.g., the feature starts disabled by default until fully validated).
+- Feature-flagged behavior MUST be covered by tests in both modes (enabled and disabled) when the
+  feature can materially change externally visible behavior.
+
+Rationale: Feature flags de-risk incremental delivery and allow safe rollout/rollback without
+redeploy.
+
 ## Additional Constraints
 
 ### Technology & Structure
@@ -133,6 +162,8 @@ A change is “done” only when all are true:
   tests for invalid inputs and error responses
 - Error-code contract is implemented and tested (including correct HTTP status semantics)
 - Performance budget impact considered; any risk is documented
+- If the change introduces a new feature or non-trivial behavior change, it is feature-flagged via
+  `FeatureFlag.<featureName>` and the default (enabled/disabled) is documented
 - Build passes on a clean checkout using the Gradle wrapper
 
 ### Required Gates
@@ -144,6 +175,8 @@ A change is “done” only when all are true:
   through HTTP status codes and standard headers.
 - If the change affects public HTTP contracts, verify it remains backward compatible per Principle 6
   (no new required inputs; only additive optional inputs and/or additive outputs).
+- If the change adds a new feature or non-trivial behavior change, tests MUST cover both flag states
+  where feasible (enabled and disabled).
 
 ### Review Expectations
 Reviewers MUST verify:
@@ -152,7 +185,8 @@ Reviewers MUST verify:
 - Error codes are clear, stable, and consistent
 - HTTP status codes correctly reflect the error class (4xx vs 5xx, retry guidance via headers)
 - Any performance-sensitive path is measured/guarded
-- Public API changes are additive-only and do not introduce explicit API versioning.
+- Public API changes are additive-only and do not introduce explicit API versioning
+- New features are guarded by `FeatureFlag.<featureName>` and can be toggled via Spring properties
 
 ## Governance
 
@@ -178,4 +212,4 @@ Reviewers MUST verify:
 - At least quarterly (or when repeated exceptions occur), review whether rules are still correct
   and feasible.
 
-**Version**: 1.2.0 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date unknown | **Last Amended**: 2025-12-26
+**Version**: 1.4.0 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date unknown | **Last Amended**: 2025-12-27
