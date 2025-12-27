@@ -24,8 +24,8 @@ description: "Task list for implementing Users API (Users & Roles) with AuthN/Au
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 Verify current build is green (`./gradlew test`) and note baseline failures (repo root)
-- [ ] T002 Sync local feature docs into agent context (run `.specify/scripts/powershell/update-agent-context.ps1 -AgentType copilot`) (`.specify/scripts/powershell/update-agent-context.ps1`)
+- [x] T001 Verify current build is green (`./gradlew test`) and note baseline failures (repo root)
+- [x] T002 Sync local feature docs into agent context (run `.specify/scripts/powershell/update-agent-context.ps1 -AgentType copilot`) (`.specify/scripts/powershell/update-agent-context.ps1`)
 
 ---
 
@@ -35,34 +35,34 @@ description: "Task list for implementing Users API (Users & Roles) with AuthN/Au
 
 ### OpenAPI source-of-truth + code generation
 
-- [ ] T003 Update Users API contract in `src/main/resources/openapi.yaml` to match `specs/003-users-api/contracts/openapi.contract.yaml` (paths/schemas/security/401/403/bootstrap docs)
-- [ ] T004 Regenerate OpenAPI interfaces/models (`openApiGenerate`) and ensure generated sources compile (`build.gradle`, `src/main-gen/java/...`)
+- [x] T003 Update Users API contract in `src/main/resources/openapi.yaml` to match `specs/003-users-api/contracts/openapi.contract.yaml` (paths/schemas/security/401/403/bootstrap docs)
+- [x] T004 Regenerate OpenAPI interfaces/models (`openApiGenerate`) and ensure generated sources compile (`build.gradle`, `src/main-gen/java/...`)
 
 ### Feature-flag wiring (404 when disabled)
 
-- [ ] T005 Implement `FeatureFlag.usersApi` property wiring (default `false`) (`src/main/java/com/example/specdriven/config/FeatureFlagProperties.java`, `src/main/resources/application.properties`)
-- [ ] T006 [P] Add reusable controller/handler helper to short-circuit disabled endpoints to 404 with shared error (`src/main/java/com/example/specdriven/feature/UsersApiFeatureGate.java`)
+- [x] T005 Implement `FeatureFlag.usersApi` property wiring (default `false`) (`src/main/java/com/example/specdriven/config/FeatureFlagProperties.java`, `src/main/resources/application.properties`)
+- [x] T006 [P] Add reusable controller/handler helper to short-circuit disabled endpoints to 404 with shared error (`src/main/java/com/example/specdriven/feature/UsersApiFeatureGate.java`)
 - [ ] T007 [P] Add tests that Users endpoints (including `/login`) return 404 when `FeatureFlag.usersApi=false` (`src/test/java/com/example/specdriven/users/UsersApiFeatureFlagDisabledTest.java`)
 
 ### Persistence foundation (SQL + H2 default)
 
-- [ ] T008 Add persistence dependencies and baseline configuration (H2 + Spring Data JDBC) (`build.gradle`, `src/main/resources/application.properties`)
-- [ ] T009 Create DB schema for users/roles/user_roles/role_permissions (Flyway or schema.sql; pick repo convention) (`src/main/resources/db/migration/V003__users_api.sql` or `src/main/resources/schema.sql`)
-- [ ] T010 Implement repositories for users and role relations (Data JDBC) (`src/main/java/com/example/specdriven/users/persistence/UserEntity.java`, `src/main/java/com/example/specdriven/users/persistence/UserRepository.java`, `src/main/java/com/example/specdriven/users/persistence/UserRoleRepository.java`)
+- [x] T008 Add persistence dependencies and baseline configuration (H2 + Spring Data JDBC) (`build.gradle`, `src/main/resources/application.properties`)
+- [x] T009 Create DB schema for users/roles/user_roles/role_permissions (Flyway or schema.sql; pick repo convention) (`src/main/resources/db/migration/V003__users_api.sql` or `src/main/resources/schema.sql`)
+- [x] T010 Implement repositories for users and role relations (Data JDBC) (`src/main/java/com/example/specdriven/users/persistence/UserEntity.java`, `src/main/java/com/example/specdriven/users/persistence/UserRepository.java`, `src/main/java/com/example/specdriven/users/persistence/UserRoleRepository.java`)
 - [ ] T011 [P] Add persistence smoke test verifying schema + basic insert/select works on H2 (`src/test/java/com/example/specdriven/users/persistence/UserRepositoryTest.java`)
 
 ### Error codes + shared error mapping for Users feature
 
-- [ ] T012 Extend `ApiErrorCode` with Users/auth-specific stable codes (UNAUTHORIZED, FORBIDDEN, USER_NOT_FOUND, RESOURCE_CONFLICT, INVALID_CREDENTIALS, FEATURE_DISABLED as needed) (`src/main/java/com/example/specdriven/error/ApiErrorCode.java`)
-- [ ] T013 Map Spring Security auth failures to shared `ErrorResponse` with correct code/status (401/403) (`src/main/java/com/example/specdriven/error/GlobalExceptionHandler.java`, `src/main/java/com/example/specdriven/security/SecurityExceptionHandlers.java`)
+- [x] T012 Extend `ApiErrorCode` with Users/auth-specific stable codes (UNAUTHORIZED, FORBIDDEN, USER_NOT_FOUND, RESOURCE_CONFLICT, INVALID_CREDENTIALS, FEATURE_DISABLED as needed) (`src/main/java/com/example/specdriven/error/ApiErrorCode.java`)
+- [x] T013 Map Spring Security auth failures to shared `ErrorResponse` with correct code/status (401/403) (`src/main/java/com/example/specdriven/error/GlobalExceptionHandler.java`, `src/main/java/com/example/specdriven/security/SecurityExceptionHandlers.java`)
 - [ ] T014 [P] Add tests for 401/403 error responses body shape + code mapping (`src/test/java/com/example/specdriven/security/SecurityErrorResponsesTest.java`)
 
 ### Spring Security bearer tokens + bootstrap rule infrastructure
 
-- [ ] T015 Add Spring Security configuration for stateless bearer auth + public `/login` route (`src/main/java/com/example/specdriven/security/SecurityConfig.java`)
-- [ ] T016 Implement token service (mint + validate) (JWT or opaque; keep internal) (`src/main/java/com/example/specdriven/security/TokenService.java`)
-- [ ] T017 Implement bearer token authentication filter that sets authenticated principal on valid token (`src/main/java/com/example/specdriven/security/BearerTokenAuthFilter.java`)
-- [ ] T018 Implement bootstrap authorization rule: allow unauthenticated `POST /users` only when `UserRepository.count()==0` (`src/main/java/com/example/specdriven/security/BootstrapCreateUserAuthorizationManager.java`)
+- [x] T015 Add Spring Security configuration for stateless bearer auth + public `/login` route (`src/main/java/com/example/specdriven/security/SecurityConfig.java`)
+- [x] T016 Implement token service (mint + validate) (JWT or opaque; keep internal) (`src/main/java/com/example/specdriven/security/TokenService.java`)
+- [x] T017 Implement bearer token authentication filter that sets authenticated principal on valid token (`src/main/java/com/example/specdriven/security/BearerTokenAuthFilter.java`)
+- [x] T018 Implement bootstrap authorization rule: allow unauthenticated `POST /users` only when `UserRepository.count()==0` (`src/main/java/com/example/specdriven/security/BootstrapCreateUserAuthorizationManager.java`)
 - [ ] T019 [P] Add security integration tests: `/login` public, protected endpoints require bearer, bootstrap create-user behavior (0 users  allow, >0 users deny) (`src/test/java/com/example/specdriven/security/UsersApiSecurityRulesTest.java`)
 
 **Checkpoint**: OpenAPI regenerated, feature flag exists + tested, persistence works, security infra exists + tested.
