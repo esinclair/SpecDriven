@@ -21,7 +21,7 @@ class PingControllerTest {
     void ping_returnsPongWithinBudget() throws Exception {
         long start = System.nanoTime();
 
-        mvc.perform(get("/v1/ping"))
+        mvc.perform(get("/ping"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("pong"));
 
@@ -30,4 +30,3 @@ class PingControllerTest {
         org.junit.jupiter.api.Assertions.assertTrue(elapsedMs < 1000, "Expected < 1000ms but was " + elapsedMs + "ms");
     }
 }
-

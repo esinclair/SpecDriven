@@ -5,7 +5,7 @@ info:
 servers:
   - url: /
 paths:
-  /v1/ping:
+  /ping:
     get:
       operationId: ping
       summary: Lightweight health check

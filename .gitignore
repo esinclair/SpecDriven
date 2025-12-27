@@ -1,6 +1,11 @@
 HELP.md
 .gradle
 build/
+
+# Generated sources (OpenAPI codegen)
+src/main-gen/
+src/test-gen/
+
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

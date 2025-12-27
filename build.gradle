@@ -36,11 +36,23 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 def openApiSpec = "$rootDir/src/main/resources/openapi.yaml"
 
+def generatedMainDir = file("$rootDir/src/main-gen")
+def generatedTestDir = file("$rootDir/src/test-gen")
+
 tasks.named('openApiGenerate', GenerateTask) {
     // ensure deterministic generation (build should be reproducible)
     inputSpec.set(openApiSpec)
     generatorName.set('spring')
-    outputDir.set("${layout.buildDirectory.get().asFile}/generated/openapi")
+
+    // OpenAPI Generator always writes into {outputDir}/{sourceFolder}.
+    // We want Java sources to land at: src/main-gen/java
+    // So we generate against the project root and override sourceFolder accordingly.
+    outputDir.set(rootDir.absolutePath)
+
+    // OpenAPI generator expects a path relative to outputDir
+    additionalProperties.set([
+            sourceFolder: 'src/main-gen/java'
+    ])
 
     apiPackage.set('com.example.specdriven.api')
     modelPackage.set('com.example.specdriven.api.model')
@@ -56,23 +68,45 @@ tasks.named('openApiGenerate', GenerateTask) {
             dateLibrary           : 'java8',
             serializableModel     : 'true'
     ])
+
+    // Writing generated sources under the project directory can confuse Gradle's output snapshotting on Windows.
+    // This task is deterministic and already wired into compilation, so we disable state tracking.
+    doNotTrackState("Generates sources into src/main-gen (inside the project dir)")
 }
 
-def generatedOpenApiSrcDir = "${layout.buildDirectory.get().asFile}/generated/openapi/src/main/java"
+
+def generatedOpenApiMainSrcDir = file("$generatedMainDir/java")
+
+def generatedOpenApiTestSrcDir = file("$generatedTestDir/java")
 
 sourceSets {
     main {
         java {
-            srcDir generatedOpenApiSrcDir
+            srcDir generatedOpenApiMainSrcDir
+        }
+    }
+    test {
+        java {
+            // reserved for generated tests if/when enabled
+            srcDir generatedOpenApiTestSrcDir
         }
     }
 }
 
-// Ensure generation runs before compilation
+// Ensure generation runs before compilation and resource processing
 tasks.named('compileJava') {
+    dependsOn tasks.named('openApiGenerate')
+}
+
+tasks.named('processResources') {
     dependsOn tasks.named('openApiGenerate')
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// Also remove generated source roots on clean
+tasks.named('clean', Delete) {
+    delete generatedMainDir, generatedTestDir
 }
