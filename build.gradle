@@ -61,6 +61,7 @@ tasks.named('openApiGenerate', GenerateTask) {
     // Generate interfaces only; we implement controllers ourselves.
     configOptions.set([
             interfaceOnly         : 'true',
+            skipDefaultInterface  : 'true',
             useSpringBoot3        : 'true',
             useJakartaEe          : 'true',
             openApiNullable       : 'false',
@@ -83,10 +84,13 @@ tasks.named('openApiGenerate', GenerateTask) {
     // This task is deterministic and already wired into compilation, so we disable state tracking.
     doNotTrackState("Generates sources into src/main-gen (inside the project dir)")
 
-    // OpenAPI Generator still writes some metadata/ignore files even when supportingFiles=false.
+    // OpenAPI Generator still writes some metadata/ignore files even when supportingFiles is disabled.
     // Remove them to keep the workspace clean.
+    // Note: We manually maintain ApiUtil.java in src/main-gen/java/com/example/specdriven/api/
+    // because the generator creates default interface implementations that reference it,
+    // but doesn't generate the utility class itself with interfaceOnly=true.
     doLast {
-        delete file("$rootDir/.openapi-generator"), file("$rootDir/.openapi-generator-ignore")
+        delete file("$rootDir/.openapi-generator"), file("$rootDir/.openapi-generator-ignore"), file("$rootDir/README.md"), file("$rootDir/pom.xml"), file("$rootDir/README.md")
     }
 }
 
@@ -122,7 +126,10 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-// Also remove generated source roots on clean
+// Also remove generated source roots on clean, but preserve ApiUtil.java
 tasks.named('clean', Delete) {
-    delete generatedMainDir, generatedTestDir
+    delete generatedTestDir
+    // For generatedMainDir, delete everything except ApiUtil.java
+    delete fileTree(generatedMainDir) {
+    }
 }
