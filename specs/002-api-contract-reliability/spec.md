@@ -5,6 +5,12 @@
 **Status**: Draft  
 **Input**: User description: "OpenAPI-first REST contract (OpenAPI spec is source of truth; Java generated; no manual edits to generated code), retryability semantics via HTTP status codes only (no 'retryable' field/parameter), 1-second response budget, clear error codes, and mandatory positive + negative scenarios including invalid inputs and error responses."
 
+## Clarifications
+
+### Session 2025-12-27
+
+- Q: Which specific HTTP status code should the API use for validation/invalid input? → A: **400 Bad Request**.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Maintain a single source-of-truth API contract (Priority: P1)
@@ -117,7 +123,7 @@ As an API consumer, I want responses to return quickly and, when errors occur, t
 - **FR-010 (Stable error format)**: Error responses MUST use a consistent JSON structure that includes at minimum a stable machine-readable `code` and a human-readable `message`.
 - **FR-011 (Clear error codes)**: Error `code` values MUST be documented and stable over time; codes MUST enable clients to distinguish at least: validation errors, missing resources, conflicts, rate limits, and unexpected server errors.
 - **FR-012 (Documented error responses)**: Each endpoint in the OpenAPI contract MUST document its possible error responses (relevant **4xx** and **5xx**) with the shared error schema.
-- **FR-013 (Validation behavior)**: For invalid inputs (missing/invalid fields, type mismatch, out-of-range values), the API MUST respond with **4xx** and an error `code` that indicates invalid input.
+- **FR-013 (Validation behavior)**: For invalid inputs (missing/invalid fields, type mismatch, out-of-range values), the API MUST respond with **400** and an error `code` that indicates invalid input.
 - **FR-014 (Transient failure behavior)**: For transient failures where a retry may succeed (e.g., temporary unavailability), the API MUST respond with a retry-appropriate **5xx** (commonly **503**) and SHOULD include `Retry-After` when the server can provide meaningful guidance.
 - **FR-015 (No contract drift)**: Behavior exposed by the deployed API MUST match the OpenAPI contract for request/response shapes and documented status codes.
 - **FR-016 (Mandatory negative scenarios)**: Each endpoint MUST have documented negative scenarios covering, at minimum: invalid input, missing resource (when applicable), conflict (when applicable), and a server/transient error response (when applicable).
@@ -150,7 +156,7 @@ As an API consumer, I want responses to return quickly and, when errors occur, t
 
 - **AC-014 (for FR-012)**: Each endpoint lists its expected **4xx/5xx** responses and references the shared error schema.
 
-- **AC-015 (for FR-013)**: Requests with missing required fields, invalid types, out-of-range values, or unknown fields yield **4xx** responses with a validation-related error `code`.
+- **AC-015 (for FR-013)**: Requests with missing required fields, invalid types, out-of-range values, or unknown fields yield **400** responses with a validation-related error `code`.
 
 - **AC-016 (for FR-014)**: When the server is temporarily unavailable, responses use a retry-appropriate **5xx** (commonly **503**) and may include `Retry-After` when applicable.
 

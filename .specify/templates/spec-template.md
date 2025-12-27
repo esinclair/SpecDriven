@@ -16,6 +16,9 @@
   - Positive scenarios (happy path)
   - Negative scenarios (invalid inputs, error responses, exception paths)
 
+  When an endpoint may return more than one item (list/array), the API MUST use a paged result set
+  and the OpenAPI contract MUST require pagination inputs and define paging metadata in the response.
+
   Retryability semantics MUST be expressed via HTTP status codes and standard headers (e.g., Retry-After),
   NOT via any "retryable" request/response field.
 
@@ -23,6 +26,11 @@
   - No `/v1` in paths, and no versioning via headers/query params/media types.
   - Breaking changes are NOT allowed (e.g., adding new REQUIRED inputs). Only additive changes are
     allowed: new OPTIONAL inputs and/or additional output fields.
+
+  Feature flagging (new features / non-trivial behavior changes):
+  - Specify the Spring boolean property `FeatureFlag.<featureName>` that gates the behavior.
+  - `true` enables, `false` disables.
+  - Document the default value and any rollout plan.
   
   Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
   Think of each story as a standalone slice of functionality that can be:

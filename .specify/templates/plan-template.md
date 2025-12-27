@@ -35,11 +35,16 @@
   alternative flows.
 - Performance budget: identify any synchronous paths and how they will meet the ≤1s response goal
   (or explicitly redesign as async/paginated/etc.).
+- Paged results: if any endpoint may return more than one item, the plan uses a paged result set and
+  includes required pagination parameters + response metadata in the OpenAPI contract.
 - Error contract: plan defines error response shape with clear `code` values and correct HTTP status
   semantics (including retry guidance via standard headers like `Retry-After` when applicable).
 - Public API compatibility: the plan does NOT introduce explicit API versioning (no `/v1`, headers,
   query params, or media type versioning) and makes only additive contract changes (no new required
   inputs; only optional new inputs and/or additive outputs).
+- Feature flagging: if the change adds a new feature or non-trivial behavior change, the plan defines
+  a Spring boolean property flag named `FeatureFlag.<featureName>` that gates the behavior
+  (`true` enables, `false` disables) and documents the default value.
 - Build gate: plan assumes `./gradlew test` is the minimum green gate on a clean checkout.
 
 ## Project Structure
