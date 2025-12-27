@@ -1,6 +1,7 @@
 package com.example.specdriven.security;
 
 import com.example.specdriven.users.persistence.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import java.util.function.Supplier;
  * This enables bootstrap creation of the first admin user.
  */
 @Component
+@ConditionalOnProperty(name = "feature-flag.users-api", havingValue = "true")
 public class BootstrapCreateUserAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
 
     private final UserRepository userRepository;

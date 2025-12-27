@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -19,6 +20,7 @@ import java.util.Map;
  * Custom access denied handler that returns 403 with shared ErrorResponse format.
  */
 @Component
+@ConditionalOnProperty(name = "feature-flag.users-api", havingValue = "true")
 public class SecurityAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
