@@ -20,6 +20,13 @@
   ============================================================================
 -->
 
+## Public API Compatibility (if applicable)
+
+- [ ] CHK000 No explicit API versioning added (no `/v1` paths; no version headers/query params/media types)
+- [ ] CHK000 Existing operations remain backward compatible (no new REQUIRED request inputs)
+- [ ] CHK000 Any request additions are OPTIONAL with sensible defaults (no behavior change if omitted)
+- [ ] CHK000 Response changes are additive only (only additional fields) and clients can ignore them
+
 ## [Category 1]
 
 - [ ] CHK001 First checklist item with clear action

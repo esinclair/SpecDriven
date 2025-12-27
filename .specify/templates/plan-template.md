@@ -37,6 +37,9 @@
   (or explicitly redesign as async/paginated/etc.).
 - Error contract: plan defines error response shape with clear `code` values and correct HTTP status
   semantics (including retry guidance via standard headers like `Retry-After` when applicable).
+- Public API compatibility: the plan does NOT introduce explicit API versioning (no `/v1`, headers,
+  query params, or media type versioning) and makes only additive contract changes (no new required
+  inputs; only optional new inputs and/or additive outputs).
 - Build gate: plan assumes `./gradlew test` is the minimum green gate on a clean checkout.
 
 ## Project Structure
