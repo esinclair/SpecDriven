@@ -1,51 +1,53 @@
 -- Users API Database Schema (V003)
 -- Creates tables for users, roles, role_permissions, and user_roles
 
--- Users table (lowercase for H2 compatibility with Spring Data JDBC)
-CREATE TABLE "users" (
-    "id" UUID PRIMARY KEY,
-    "username" VARCHAR(50) NOT NULL,
-    "name" VARCHAR(200) NOT NULL,
-    "email_address" VARCHAR(254) NOT NULL UNIQUE,
-    "password_hash" VARCHAR(255) NOT NULL,
-    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- Users table (all-caps naming)
+CREATE TABLE "USERS" (
+    "ID" UUID PRIMARY KEY,
+    "USERNAME" VARCHAR(50) NOT NULL,
+    "NAME" VARCHAR(200) NOT NULL,
+    "EMAIL_ADDRESS" VARCHAR(254) NOT NULL UNIQUE,
+    "PASSWORD_HASH" VARCHAR(255) NOT NULL,
+    "CREATED_AT" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "UPDATED_AT" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX "idx_users_username" ON "users"("username");
-CREATE INDEX "idx_users_email" ON "users"("email_address");
+CREATE INDEX "IDX_USERS_USERNAME" ON "USERS"("USERNAME");
+CREATE INDEX "IDX_USERS_EMAIL" ON "USERS"("EMAIL_ADDRESS");
 
 -- Roles table (catalog of available roles)
-CREATE TABLE "roles" (
-    "role_name" VARCHAR(50) PRIMARY KEY
+CREATE TABLE "ROLES" (
+    "ROLE_NAME" VARCHAR(50) PRIMARY KEY
 );
 
 -- Role permissions table (defines which permissions each role has)
-CREATE TABLE "role_permissions" (
-    "role_name" VARCHAR(50) NOT NULL,
-    "permission" VARCHAR(50) NOT NULL,
-    PRIMARY KEY ("role_name", "permission"),
-    FOREIGN KEY ("role_name") REFERENCES "roles"("role_name") ON DELETE CASCADE
+CREATE TABLE "ROLE_PERMISSIONS" (
+    "ID" UUID PRIMARY KEY,
+    "ROLE_NAME" VARCHAR(50) NOT NULL,
+    "PERMISSION" VARCHAR(50) NOT NULL,
+    UNIQUE ("ROLE_NAME", "PERMISSION"),
+    FOREIGN KEY ("ROLE_NAME") REFERENCES "ROLES"("ROLE_NAME") ON DELETE CASCADE
 );
 
 -- User roles table (many-to-many relationship between users and roles)
-CREATE TABLE "user_roles" (
-    "user_id" UUID NOT NULL,
-    "role_name" VARCHAR(50) NOT NULL,
-    PRIMARY KEY ("user_id", "role_name"),
-    FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE,
-    FOREIGN KEY ("role_name") REFERENCES "roles"("role_name") ON DELETE CASCADE
+CREATE TABLE "USER_ROLES" (
+    "ID" UUID PRIMARY KEY,
+    "USER_ID" UUID NOT NULL,
+    "ROLE_NAME" VARCHAR(50) NOT NULL,
+    UNIQUE ("USER_ID", "ROLE_NAME"),
+    FOREIGN KEY ("USER_ID") REFERENCES "USERS"("ID") ON DELETE CASCADE,
+    FOREIGN KEY ("ROLE_NAME") REFERENCES "ROLES"("ROLE_NAME") ON DELETE CASCADE
 );
 
 -- Seed initial roles based on the API contract
-INSERT INTO "roles" ("role_name") VALUES ('ADMIN');
-INSERT INTO "roles" ("role_name") VALUES ('USER');
-INSERT INTO "roles" ("role_name") VALUES ('VIEWER');
+INSERT INTO "ROLES" ("ROLE_NAME") VALUES ('ADMIN');
+INSERT INTO "ROLES" ("ROLE_NAME") VALUES ('USER');
+INSERT INTO "ROLES" ("ROLE_NAME") VALUES ('VIEWER');
 
 -- Seed role permissions based on the API contract
-INSERT INTO "role_permissions" ("role_name", "permission") VALUES ('ADMIN', 'READ');
-INSERT INTO "role_permissions" ("role_name", "permission") VALUES ('ADMIN', 'WRITE');
-INSERT INTO "role_permissions" ("role_name", "permission") VALUES ('ADMIN', 'DELETE');
-INSERT INTO "role_permissions" ("role_name", "permission") VALUES ('USER', 'READ');
-INSERT INTO "role_permissions" ("role_name", "permission") VALUES ('USER', 'WRITE');
-INSERT INTO "role_permissions" ("role_name", "permission") VALUES ('VIEWER', 'READ');
+INSERT INTO "ROLE_PERMISSIONS" ("ID", "ROLE_NAME", "PERMISSION") VALUES (RANDOM_UUID(), 'ADMIN', 'READ');
+INSERT INTO "ROLE_PERMISSIONS" ("ID", "ROLE_NAME", "PERMISSION") VALUES (RANDOM_UUID(), 'ADMIN', 'WRITE');
+INSERT INTO "ROLE_PERMISSIONS" ("ID", "ROLE_NAME", "PERMISSION") VALUES (RANDOM_UUID(), 'ADMIN', 'DELETE');
+INSERT INTO "ROLE_PERMISSIONS" ("ID", "ROLE_NAME", "PERMISSION") VALUES (RANDOM_UUID(), 'USER', 'READ');
+INSERT INTO "ROLE_PERMISSIONS" ("ID", "ROLE_NAME", "PERMISSION") VALUES (RANDOM_UUID(), 'USER', 'WRITE');
+INSERT INTO "ROLE_PERMISSIONS" ("ID", "ROLE_NAME", "PERMISSION") VALUES (RANDOM_UUID(), 'VIEWER', 'READ');

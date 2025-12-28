@@ -16,36 +16,36 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends CrudRepository<UserEntity, UUID> {
 
-    @Query("SELECT COUNT(*) FROM \"users\"")
+    @Query("SELECT COUNT(*) FROM \"USERS\"")
     long count();
 
-    @Query("SELECT * FROM \"users\" WHERE \"username\" = :username")
+    @Query("SELECT * FROM \"USERS\" WHERE \"USERNAME\" = :username")
     Optional<UserEntity> findByUsername(@Param("username") String username);
 
-    @Query("SELECT * FROM \"users\" WHERE \"email_address\" = :email")
+    @Query("SELECT * FROM \"USERS\" WHERE \"EMAIL_ADDRESS\" = :email")
     Optional<UserEntity> findByEmailAddress(@Param("email") String email);
 
-    @Query("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM \"users\" WHERE \"email_address\" = :email")
+    @Query("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM \"USERS\" WHERE \"EMAIL_ADDRESS\" = :email")
     boolean existsByEmailAddress(@Param("email") String email);
 
-    @Query("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM \"users\" WHERE \"username\" = :username")
+    @Query("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM \"USERS\" WHERE \"USERNAME\" = :username")
     boolean existsByUsername(@Param("username") String username);
 
     // For pagination, we'll use simple queries that return all matching records
     // and handle pagination in the service layer
-    @Query("SELECT * FROM \"users\"")
+    @Query("SELECT * FROM \"USERS\"")
     List<UserEntity> findAllUsers();
 
-    @Query("SELECT * FROM \"users\" WHERE \"id\" IN (:ids)")
+    @Query("SELECT * FROM \"USERS\" WHERE \"ID\" IN (:ids)")
     List<UserEntity> findByIdIn(@Param("ids") Set<UUID> ids);
 
-    @Query("SELECT * FROM \"users\" WHERE \"username\" LIKE CONCAT('%', :username, '%')")
+    @Query("SELECT * FROM \"USERS\" WHERE \"USERNAME\" LIKE CONCAT('%', :username, '%')")
     List<UserEntity> findByUsernameContaining(@Param("username") String username);
 
-    @Query("SELECT * FROM \"users\" WHERE \"email_address\" LIKE CONCAT('%', :email, '%')")
+    @Query("SELECT * FROM \"USERS\" WHERE \"EMAIL_ADDRESS\" LIKE CONCAT('%', :email, '%')")
     List<UserEntity> findByEmailAddressContaining(@Param("email") String email);
 
-    @Query("SELECT * FROM \"users\" WHERE LOWER(\"name\") LIKE LOWER(CONCAT('%', :name, '%'))")
+    @Query("SELECT * FROM \"USERS\" WHERE LOWER(\"NAME\") LIKE LOWER(CONCAT('%', :name, '%'))")
     List<UserEntity> findByNameContainingIgnoreCase(@Param("name") String name);
 }
 

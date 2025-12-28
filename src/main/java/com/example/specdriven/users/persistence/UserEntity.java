@@ -6,28 +6,28 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import java.util.UUID;
 
-@Table("users")
+@Table("USERS")
 public class UserEntity {
     @Id
-    @Column("id")
+    @Column("ID")
     private UUID id;
     
-    @Column("username")
+    @Column("USERNAME")
     private String username;
     
-    @Column("name")
+    @Column("NAME")
     private String name;
     
-    @Column("email_address")
+    @Column("EMAIL_ADDRESS")
     private String emailAddress;
     
-    @Column("password_hash")
+    @Column("PASSWORD_HASH")
     private String passwordHash;
     
-    @Column("created_at")
+    @Column("CREATED_AT")
     private java.time.LocalDateTime createdAt;
     
-    @Column("updated_at")
+    @Column("UPDATED_AT")
     private java.time.LocalDateTime updatedAt;
 
     public UserEntity() {

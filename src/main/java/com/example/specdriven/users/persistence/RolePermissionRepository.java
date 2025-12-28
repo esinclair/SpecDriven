@@ -6,11 +6,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface RolePermissionRepository extends CrudRepository<RolePermissionEntity, Long> {
+public interface RolePermissionRepository extends CrudRepository<RolePermissionEntity, UUID> {
 
-    @Query("SELECT * FROM role_permissions WHERE role_name = :roleName")
+    @Query("SELECT * FROM \"ROLE_PERMISSIONS\" WHERE \"ROLE_NAME\" = :roleName")
     List<RolePermissionEntity> findByRoleName(@Param("roleName") String roleName);
 }
 

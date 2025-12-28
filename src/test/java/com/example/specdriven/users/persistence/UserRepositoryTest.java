@@ -33,7 +33,7 @@ class UserRepositoryTest {
         // Given a user - insert directly via JDBC to test schema
         UUID userId = UUID.randomUUID();
         jdbcTemplate.update(
-                "INSERT INTO \"users\" (\"id\", \"username\", \"name\", \"email_address\", \"password_hash\", \"created_at\", \"updated_at\") VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+                "INSERT INTO \"USERS\" (\"ID\", \"USERNAME\", \"NAME\", \"EMAIL_ADDRESS\", \"PASSWORD_HASH\", \"CREATED_AT\", \"UPDATED_AT\") VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
                 userId, "testuser", "Test User", "test@example.com", "$2a$10$dummyhash"
         );
 
@@ -53,7 +53,7 @@ class UserRepositoryTest {
 
         // When we insert a user via JDBC
         jdbcTemplate.update(
-                "INSERT INTO \"users\" (\"id\", \"username\", \"name\", \"email_address\", \"password_hash\", \"created_at\", \"updated_at\") VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+                "INSERT INTO \"USERS\" (\"ID\", \"USERNAME\", \"NAME\", \"EMAIL_ADDRESS\", \"PASSWORD_HASH\", \"CREATED_AT\", \"UPDATED_AT\") VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
                 UUID.randomUUID(), "counttest", "Count Test", "count@example.com", "$2a$10$dummyhash"
         );
 
@@ -67,7 +67,7 @@ class UserRepositoryTest {
         // Given a user
         UUID userId = UUID.randomUUID();
         jdbcTemplate.update(
-                "INSERT INTO \"users\" (\"id\", \"username\", \"name\", \"email_address\", \"password_hash\", \"created_at\", \"updated_at\") VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+                "INSERT INTO \"USERS\" (\"ID\", \"USERNAME\", \"NAME\", \"EMAIL_ADDRESS\", \"PASSWORD_HASH\", \"CREATED_AT\", \"UPDATED_AT\") VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
                 userId, "emailtest", "Email Test", "unique@example.com", "$2a$10$dummyhash"
         );
 

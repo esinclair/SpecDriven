@@ -1,15 +1,21 @@
 package com.example.specdriven.users.persistence;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.UUID;
 
-@Table("user_roles")
+@Table("USER_ROLES")
 public class UserRoleEntity {
     @Id
-    private Long id;
+    @Column("ID")
+    private UUID id;
+
+    @Column("USER_ID")
     private UUID userId;
+
+    @Column("ROLE_NAME")
     private String roleName;
 
     public UserRoleEntity() {}
@@ -19,11 +25,11 @@ public class UserRoleEntity {
         this.roleName = roleName;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
