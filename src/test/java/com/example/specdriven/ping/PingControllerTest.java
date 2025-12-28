@@ -1,5 +1,6 @@
 package com.example.specdriven.ping;
 
+import com.example.specdriven.config.FeatureFlagProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -17,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = PingController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class, UserDetailsServiceAutoConfiguration.class})
-@Import(com.example.specdriven.error.GlobalExceptionHandler.class)
+@Import({com.example.specdriven.error.GlobalExceptionHandler.class, FeatureFlagProperties.class})
 class PingControllerTest {
 
     @Autowired

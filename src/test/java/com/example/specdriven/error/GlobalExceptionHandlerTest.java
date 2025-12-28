@@ -1,5 +1,6 @@
 package com.example.specdriven.error;
 
+import com.example.specdriven.config.FeatureFlagProperties;
 import com.example.specdriven.ping.PingController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {PingController.class, GlobalExceptionHandlerTest.ThrowingController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class, UserDetailsServiceAutoConfiguration.class})
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, FeatureFlagProperties.class})
 class GlobalExceptionHandlerTest {
 
     @Autowired
