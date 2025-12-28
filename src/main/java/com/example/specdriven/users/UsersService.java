@@ -11,6 +11,7 @@ import com.example.specdriven.users.persistence.UserEntity;
 import com.example.specdriven.users.persistence.UserRepository;
 import com.example.specdriven.users.persistence.UserRoleEntity;
 import com.example.specdriven.users.persistence.UserRoleRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * T027-T028, T042-T043, T047-T050, T057, T081-T083: Service layer implementation.
  */
 @Service
+@ConditionalOnProperty(name = "feature-flag.users-api", havingValue = "true")
 public class UsersService {
     
     private final UserRepository userRepository;

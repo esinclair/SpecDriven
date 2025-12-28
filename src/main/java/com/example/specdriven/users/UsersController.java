@@ -19,6 +19,7 @@ import java.util.UUID;
  * T029, T044, T051, T058: Controller implementation.
  */
 @RestController
+@ConditionalOnProperty(name = "feature-flag.users-api", havingValue = "true")
 public class UsersController implements UsersApi {
 
     private final UsersApiFeatureGate featureGate;

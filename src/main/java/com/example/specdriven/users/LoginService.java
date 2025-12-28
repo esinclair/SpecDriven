@@ -6,6 +6,7 @@ import com.example.specdriven.error.ApiErrorCode;
 import com.example.specdriven.error.ErrorResponseFactory;
 import com.example.specdriven.security.TokenService;
 import com.example.specdriven.users.persistence.UserEntity;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
  * T035: Login service with credential verification.
  */
 @Service
+@ConditionalOnProperty(name = "feature-flag.users-api", havingValue = "true")
 public class LoginService {
     
     private final UsersService usersService;

@@ -7,6 +7,7 @@ import com.example.specdriven.api.model.UpdateUserRequest;
 import com.example.specdriven.api.model.User;
 import com.example.specdriven.users.persistence.UserEntity;
 import com.example.specdriven.users.persistence.UserRoleEntity;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * T025: Domain model and mappers.
  */
 @Component
+@ConditionalOnProperty(name = "feature-flag.users-api", havingValue = "true")
 public class UsersMapper {
     
     /**

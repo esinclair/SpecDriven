@@ -1,5 +1,6 @@
 package com.example.specdriven.users;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
  * T026: Password hashing implementation.
  */
 @Component
+@ConditionalOnProperty(name = "feature-flag.users-api", havingValue = "true")
 public class PasswordHasher {
     
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();

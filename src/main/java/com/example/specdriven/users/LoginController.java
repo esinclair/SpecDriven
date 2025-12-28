@@ -4,6 +4,7 @@ import com.example.specdriven.api.LoginApi;
 import com.example.specdriven.api.model.LoginRequest;
 import com.example.specdriven.api.model.LoginResponse;
 import com.example.specdriven.feature.UsersApiFeatureGate;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * T036: Login controller implementation.
  */
 @RestController
+@ConditionalOnProperty(name = "feature-flag.users-api", havingValue = "true")
 public class LoginController implements LoginApi {
 
     private final UsersApiFeatureGate featureGate;
