@@ -428,7 +428,7 @@ components:
     User:
       type: object
       additionalProperties: false
-      required: [id, username, name, emailAddress, roles]
+      required: [id, username, name, emailAddress, roles, createdAt, updatedAt]
       properties:
         id:
           type: string
@@ -444,6 +444,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Role'
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the user was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the user was last updated
 
     UserPage:
       type: object

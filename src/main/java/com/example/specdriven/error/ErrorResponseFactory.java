@@ -1,6 +1,8 @@
 package com.example.specdriven.error;
 
 import com.example.specdriven.api.model.ErrorResponse;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
@@ -21,5 +23,17 @@ public final class ErrorResponseFactory {
             response.setDetails(details);
         }
         return response;
+    }
+    
+    public static ResponseStatusException badRequest(ApiErrorCode code, String message) {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+    }
+    
+    public static ResponseStatusException notFound(ApiErrorCode code, String message) {
+        return new ResponseStatusException(HttpStatus.NOT_FOUND, message);
+    }
+    
+    public static ResponseStatusException conflict(ApiErrorCode code, String message) {
+        return new ResponseStatusException(HttpStatus.CONFLICT, message);
     }
 }

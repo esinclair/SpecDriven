@@ -1,31 +1,49 @@
 package com.example.specdriven.users.persistence;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import java.time.Instant;
 import java.util.UUID;
 
 @Table("users")
 public class UserEntity {
     @Id
+    @Column("id")
     private UUID id;
+    
+    @Column("username")
     private String username;
+    
+    @Column("name")
     private String name;
+    
+    @Column("email_address")
     private String emailAddress;
+    
+    @Column("password_hash")
     private String passwordHash;
-    private Instant createdAt;
-    private Instant updatedAt;
+    
+    @Column("created_at")
+    private java.time.LocalDateTime createdAt;
+    
+    @Column("updated_at")
+    private java.time.LocalDateTime updatedAt;
 
-    public UserEntity() {}
+    public UserEntity() {
+        this.id = UUID.randomUUID();
+    }
 
-    public UserEntity(UUID id, String username, String name, String emailAddress, String passwordHash) {
+    @PersistenceCreator
+    public UserEntity(UUID id, String username, String name, String emailAddress, String passwordHash,
+                     java.time.LocalDateTime createdAt, java.time.LocalDateTime updatedAt) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.emailAddress = emailAddress;
         this.passwordHash = passwordHash;
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public UUID getId() { return id; }
@@ -38,8 +56,8 @@ public class UserEntity {
     public void setEmailAddress(String emailAddress) { this.emailAddress = emailAddress; }
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+    public java.time.LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(java.time.LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public java.time.LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(java.time.LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

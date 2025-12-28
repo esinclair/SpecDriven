@@ -42,14 +42,14 @@ description: "Task list for implementing Users API (Users & Roles) with AuthN/Au
 
 - [x] T005 Implement `FeatureFlag.usersApi` property wiring (default `false`) (`src/main/java/com/example/specdriven/config/FeatureFlagProperties.java`, `src/main/resources/application.properties`)
 - [x] T006 [P] Add reusable controller/handler helper to short-circuit disabled endpoints to 404 with shared error (`src/main/java/com/example/specdriven/feature/UsersApiFeatureGate.java`)
-- [ ] T007 [P] Add tests that Users endpoints (including `/login`) return 404 when `FeatureFlag.usersApi=false` (`src/test/java/com/example/specdriven/users/UsersApiFeatureFlagDisabledTest.java`)
+- [x] T007 [P] Add tests that Users endpoints (including `/login`) return 404 when `FeatureFlag.usersApi=false` (`src/test/java/com/example/specdriven/users/UsersApiFeatureFlagDisabledTest.java`)
 
 ### Persistence foundation (SQL + H2 default)
 
 - [x] T008 Add persistence dependencies and baseline configuration (H2 + Spring Data JDBC) (`build.gradle`, `src/main/resources/application.properties`)
 - [x] T009 Create DB schema for users/roles/user_roles/role_permissions (Flyway or schema.sql; pick repo convention) (`src/main/resources/db/migration/V003__users_api.sql` or `src/main/resources/schema.sql`)
 - [x] T010 Implement repositories for users and role relations (Data JDBC) (`src/main/java/com/example/specdriven/users/persistence/UserEntity.java`, `src/main/java/com/example/specdriven/users/persistence/UserRepository.java`, `src/main/java/com/example/specdriven/users/persistence/UserRoleRepository.java`)
-- [ ] T011 [P] Add persistence smoke test verifying schema + basic insert/select works on H2 (`src/test/java/com/example/specdriven/users/persistence/UserRepositoryTest.java`)
+- [x] T011 [P] Add persistence smoke test verifying schema + basic insert/select works on H2 (`src/test/java/com/example/specdriven/users/persistence/UserRepositoryTest.java`)
 
 ### Error codes + shared error mapping for Users feature
 
