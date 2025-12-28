@@ -37,6 +37,12 @@ dependencies {
     // Flyway for database migrations
     implementation 'org.flywaydb:flyway-core'
 
+    // Lombok for boilerplate reduction
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
     // Optional but handy if you later want to serve docs at runtime
     // implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
 

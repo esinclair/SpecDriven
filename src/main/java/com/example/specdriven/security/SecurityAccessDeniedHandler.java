@@ -1,7 +1,7 @@
 package com.example.specdriven.security;
 
 import com.example.specdriven.api.model.ErrorResponse;
-import com.example.specdriven.error.ApiErrorCode;
+import com.example.specdriven.error.ErrorCode;
 import com.example.specdriven.error.ErrorResponseFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -34,7 +34,7 @@ public class SecurityAccessDeniedHandler implements AccessDeniedHandler {
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
         ErrorResponse errorResponse = ErrorResponseFactory.from(
-                ApiErrorCode.FORBIDDEN,
+                ErrorCode.FORBIDDEN,
                 "Access denied",
                 Map.of("path", request.getRequestURI())
         );
