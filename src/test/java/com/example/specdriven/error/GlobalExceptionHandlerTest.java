@@ -19,7 +19,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = {PingController.class, GlobalExceptionHandlerTest.ThrowingController.class})
 @AutoConfigureMockMvc(addFilters = false)
-@EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class, UserDetailsServiceAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {
+        SecurityAutoConfiguration.class,
+        UserDetailsServiceAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class
+})
 @Import(GlobalExceptionHandler.class)
 class GlobalExceptionHandlerTest {
 

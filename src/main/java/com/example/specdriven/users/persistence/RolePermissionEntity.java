@@ -1,44 +1,25 @@
 package com.example.specdriven.users.persistence;
 
-import org.springframework.data.annotation.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * Role-Permission mapping entity.
+ * Uses Lombok annotations for boilerplate reduction.
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table("role_permissions")
 public class RolePermissionEntity {
-    @Id
-    private Long id;
+    @Column("role_name")
     private String roleName;
+    
+    @Column("permission_name")
     private String permissionName;
-
-    public RolePermissionEntity() {}
-
-    public RolePermissionEntity(String roleName, String permissionName) {
-        this.roleName = roleName;
-        this.permissionName = permissionName;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
-
-    public String getPermissionName() {
-        return permissionName;
-    }
-
-    public void setPermissionName(String permissionName) {
-        this.permissionName = permissionName;
-    }
 }
-
