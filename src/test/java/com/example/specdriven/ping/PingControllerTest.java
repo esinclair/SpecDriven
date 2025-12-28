@@ -16,8 +16,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = PingController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class, UserDetailsServiceAutoConfiguration.class})
-@Import(com.example.specdriven.error.GlobalExceptionHandler.class)
+@EnableAutoConfiguration(exclude = {
+        SecurityAutoConfiguration.class,
+        UserDetailsServiceAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class
+})
+@Import({com.example.specdriven.error.GlobalExceptionHandler.class})
 class PingControllerTest {
 
     @Autowired

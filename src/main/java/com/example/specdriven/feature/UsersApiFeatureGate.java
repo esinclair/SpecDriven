@@ -2,7 +2,7 @@ package com.example.specdriven.feature;
 
 import com.example.specdriven.api.model.ErrorResponse;
 import com.example.specdriven.config.FeatureFlagProperties;
-import com.example.specdriven.error.ApiErrorCode;
+import com.example.specdriven.error.ErrorCode;
 import com.example.specdriven.error.ErrorResponseFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +35,7 @@ public class UsersApiFeatureGate {
      */
     public ResponseEntity<ErrorResponse> featureDisabledResponse(String path) {
         ErrorResponse error = ErrorResponseFactory.from(
-                ApiErrorCode.FEATURE_DISABLED,
+                ErrorCode.FEATURE_DISABLED,
                 "Feature not available",
                 Map.of("path", path, "feature", "usersApi")
         );

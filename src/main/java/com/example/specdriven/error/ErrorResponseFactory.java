@@ -9,11 +9,11 @@ public final class ErrorResponseFactory {
     private ErrorResponseFactory() {
     }
 
-    public static ErrorResponse from(ApiErrorCode code, String message) {
+    public static ErrorResponse from(ErrorCode code, String message) {
         return from(code, message, null);
     }
 
-    public static ErrorResponse from(ApiErrorCode code, String message, Map<String, Object> details) {
+    public static ErrorResponse from(ErrorCode code, String message, Map<String, Object> details) {
         ErrorResponse response = new ErrorResponse();
         response.setCode(code.name());
         response.setMessage(message);
