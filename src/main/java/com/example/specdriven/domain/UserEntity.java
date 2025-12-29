@@ -2,6 +2,7 @@ package com.example.specdriven.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
  * Mapped to the 'users' table in the database.
  */
 @Table("users")
-public class UserEntity {
+public class UserEntity implements Persistable<UUID> {
     
     @Id
     private UUID id;
@@ -40,6 +41,10 @@ public class UserEntity {
     // Transient field: roles loaded separately via join
     @Transient
     private List<RoleEntity> roles;
+    
+    // Transient field to track if entity is new
+    @Transient
+    private boolean isNew = true;
     
     // Constructors
     
@@ -121,5 +126,14 @@ public class UserEntity {
     
     public void setRoles(List<RoleEntity> roles) {
         this.roles = roles;
+    }
+    
+    @Override
+    public boolean isNew() {
+        return isNew || id == null;
+    }
+    
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 }
