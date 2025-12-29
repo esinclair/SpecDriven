@@ -40,3 +40,26 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Java ###
+*.log
+*.class
+*.jar
+*.war
+*.ear
+!gradle/wrapper/gradle-wrapper.jar
+
+### macOS ###
+.DS_Store
+
+### Windows ###
+Thumbs.db
+
+### Environment ###
+.env
+.env.local
+.env.*.local
+
+### Test Reports ###
+test-results/
+coverage/

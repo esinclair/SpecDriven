@@ -1,0 +1,50 @@
+# SpecDriven Test Configuration
+
+# Feature Flags (enabled for testing)
+FeatureFlag:
+  usersApi: true  # Enable for tests
+
+# JWT Configuration (test values)
+jwt:
+  secret: test-secret-key-for-junit-tests-only-not-for-production-use
+  expirationMs: 3600000  # 1 hour for tests
+
+# Spring Boot Test Configuration
+spring:
+  application:
+    name: SpecDriven-Test
+
+  # Test Database Configuration (H2 in-memory)
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # H2 Console (disabled for tests)
+  h2:
+    console:
+      enabled: false
+
+  # Flyway Database Migrations (run for tests)
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # JDBC Configuration
+  jdbc:
+    template:
+      query-timeout: 5
+
+# Server Configuration (random port for tests)
+server:
+  port: 0
+
+# Logging Configuration (less verbose for tests)
+logging:
+  level:
+    root: WARN
+    com.example.specdriven: INFO
+    org.springframework.security: WARN
+    org.flywaydb: WARN
