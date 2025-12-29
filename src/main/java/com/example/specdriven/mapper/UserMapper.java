@@ -46,7 +46,11 @@ public class UserMapper {
     
     public UserEntity toEntity(User dto, String plainPassword) {
         UserEntity entity = new UserEntity();
-        entity.setId(dto.getId() != null ? dto.getId() : UUID.randomUUID());
+        // Let Spring Data JDBC generate the ID during save
+        if (dto.getId() != null) {
+            entity.setId(dto.getId());
+        }
+        // ID will be null for new entities - let database generate it
         entity.setUsername(dto.getUsername());
         entity.setName(dto.getName());
         entity.setEmailAddress(dto.getEmailAddress());

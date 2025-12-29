@@ -2,7 +2,7 @@
 -- Description: Create users table with indexes for core user management
 
 CREATE TABLE users (
-    id           UUID PRIMARY KEY DEFAULT random_uuid(),
+    id           UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
     username     VARCHAR(100) NOT NULL,
     name         VARCHAR(255) NOT NULL,
     email_address VARCHAR(255) NOT NULL UNIQUE,

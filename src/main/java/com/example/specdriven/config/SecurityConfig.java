@@ -45,7 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/login").permitAll()
                         // Bootstrap mode: allow POST /users without auth when no users exist
                         .requestMatchers(HttpMethod.POST, "/users").access((authentication, context) -> {
-                            long userCount = userRepository.count();
+                            long userCount = userRepository.countUsers();
                             if (userCount == 0) {
                                 return new org.springframework.security.authorization.AuthorizationDecision(true);
                             }

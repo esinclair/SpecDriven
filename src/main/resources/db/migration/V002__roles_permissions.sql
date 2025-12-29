@@ -3,14 +3,14 @@
 
 -- Roles table
 CREATE TABLE roles (
-    id          UUID PRIMARY KEY DEFAULT random_uuid(),
+    id          UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
     role_name   VARCHAR(50) NOT NULL UNIQUE,
     description VARCHAR(255)
 );
 
 -- Permissions table
 CREATE TABLE permissions (
-    id          UUID PRIMARY KEY DEFAULT random_uuid(),
+    id          UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
     permission  VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(255)
 );
