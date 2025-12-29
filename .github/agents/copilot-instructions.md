@@ -9,6 +9,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-26
 - SQL-compatible DB via Spring datasource properties; local-dev default H2 in-memory (003-users-api)
 - Java 17 (Gradle toolchain) + Spring Boot 3.5.9, Spring Web, Spring Validation, Spring Data JDBC, Spring Security, OpenAPI Generator 7.14.0, Flyway, JWT (io.jsonwebtoken 0.12.3) (main)
 - H2 in-memory database (local dev) with PostgreSQL compatibility mode; production supports any SQL database via Spring JDBC (main)
+- Java 17 (JDK 17 with Spring Boot 3.5.9) + Spring Boot 3.5.9, Spring Web, Spring Data JDBC, Spring Security, Spring Validation, JWT (jjwt 0.12.3), Flyway, OpenAPI Generator 7.14.0 (main)
+- H2 in-memory database (SQL-compliant mode), Spring Data JDBC repositories (main)
 
 ## Project Structure
 
@@ -33,8 +35,8 @@ specs/
 Java: Follow standard Java + Spring Boot conventions.
 
 ## Recent Changes
+- main: Added Java 17 (JDK 17 with Spring Boot 3.5.9) + Spring Boot 3.5.9, Spring Web, Spring Data JDBC, Spring Security, Spring Validation, JWT (jjwt 0.12.3), Flyway, OpenAPI Generator 7.14.0
 - main: Added Java 17 (Gradle toolchain) + Spring Boot 3.5.9, Spring Web, Spring Validation, Spring Data JDBC, Spring Security, OpenAPI Generator 7.14.0, Flyway, JWT (io.jsonwebtoken 0.12.3)
-- 003-users-api: Added Java 17 (Gradle toolchain) + Spring Boot 3.5.x, Spring Web, Spring Validation, Spring Security, OpenAPI Generator
 - 003-users-api: Added Java 17 (Gradle toolchain) + Spring Boot 3.5.x, Spring Web, Spring Validation, Spring Security, OpenAPI Generator
 
 <!-- MANUAL ADDITIONS START -->

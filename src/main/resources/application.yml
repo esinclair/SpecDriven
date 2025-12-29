@@ -1,0 +1,59 @@
+# SpecDriven Application Configuration
+
+# Feature Flags
+FeatureFlag:
+  usersApi: false  # Default: disabled until validated
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:default-secret-change-in-production-this-is-not-secure}
+  expirationMs: 86400000  # 24 hours in milliseconds
+
+# Spring Boot Configuration
+spring:
+  application:
+    name: SpecDriven
+
+  # Database Configuration (H2 in-memory)
+  datasource:
+    url: jdbc:h2:mem:specdriven;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # H2 Console (for development/debugging)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # Flyway Database Migrations
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # JDBC Configuration
+  jdbc:
+    template:
+      query-timeout: 5
+
+# Server Configuration
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.example.specdriven: DEBUG
+    org.springframework.security: DEBUG
+    org.flywaydb: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
