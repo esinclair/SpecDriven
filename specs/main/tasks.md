@@ -61,7 +61,7 @@
 
 ### Repositories
 
-- [ ] T017 [P] Create UserRepository.java interface in src/main/java/com/example/specdriven/repository/UserRepository.java extending CrudRepository<UserEntity, UUID> with custom @Query methods for findByEmail, countUsers, findAllPaginated
+- [ ] T017 [P] Create UserRepository.java interface in src/main/java/com/example/specdriven/repository/UserRepository.java extending PagingAndSortingRepository<UserEntity, UUID> with derived query methods: findByEmailAddress (Spring will generate query from method name)
 - [ ] T018 [P] Create RoleRepository.java interface in src/main/java/com/example/specdriven/repository/RoleRepository.java extending CrudRepository<RoleEntity, UUID> with findByRoleName method
 - [ ] T019 [P] Create UserRoleRepository.java interface in src/main/java/com/example/specdriven/repository/UserRoleRepository.java extending CrudRepository<UserRoleEntity, ?> with findByUserId, deleteByUserIdAndRoleId methods
 
@@ -271,10 +271,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T122 [US5] Add custom @Query method to UserRepository.java: findAllPaginated(int offset, int limit, filters) → List<UserEntity> using LIMIT/OFFSET
-- [ ] T123 [US5] Add custom @Query method to UserRepository.java: countWithFilters(filters) → long for totalCount calculation
-- [ ] T124 [US5] Add listUsers(page, pageSize, filters) method to UserService.java: validate pagination params, call repository with offset=(page-1)*pageSize, load roles for each user, map to User DTOs, calculate totalPages=ceil(totalCount/pageSize), return UserPage
-- [ ] T125 [US5] Implement filter logic in UserService.java: build WHERE clauses dynamically based on provided filters (username exact, emailAddress exact, name partial case-insensitive, roleName via JOIN)
+- [ ] T122 [US5] Use Spring Data's PagingAndSortingRepository to add findAll(Pageable pageable) → Page<UserEntity> method (built-in paging support)
+- [ ] T123 [US5] Add derived query methods to UserRepository.java for filtering: findByUsername, findByEmailAddress, findByNameContainingIgnoreCase (Spring generates queries from method names), and use Pageable parameter for pagination
+- [ ] T124 [US5] Add listUsers(page, pageSize, filters) method to UserService.java: validate pagination params, create Pageable object using PageRequest.of(page-1, pageSize), call repository.findAll(Pageable) or filtered methods with Pageable parameter, map Page<UserEntity> to UserPage DTO with totalCount, totalPages from Page object
+- [ ] T125 [US5] Implement filter logic in UserService.java: use appropriate Spring Data derived query methods based on provided filters (call findByUsername, findByEmailAddress, findByNameContainingIgnoreCase with Pageable parameter; for role filtering, coordinate with UserRoleRepository)
 - [ ] T126 [US5] Implement listUsers() method in UsersController.java: validate pagination parameters with @Valid, delegate to UserService, return UserPage response
 - [ ] T127 [US5] Add validation in UsersController or service to enforce pageSize maximum of 100 and minimum of 1, page minimum of 1
 - [ ] T128 [US5] Add validation to reject unsupported query parameters not defined in OpenAPI contract
