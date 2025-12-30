@@ -1,10 +1,9 @@
 <!--
 Sync Impact Report
-- Version change: 1.3.0 → 1.4.0
+- Version change: 1.4.0 → 1.5.0
 - Modified principles:
-  - 5) Spring Boot & Gradle Consistency → 5) Spring Boot & Gradle Consistency (expanded: feature flags via Spring properties)
-- Added sections:
-  - Core Principles: 8) Feature Flags (Spring Properties)
+  - 5) Spring Boot & Gradle Consistency → 5) Spring-First Development (expanded: comprehensive Spring annotations and capabilities guidance)
+- Added sections: None (expanded existing principle with detailed Spring usage guidance)
 - Removed sections: None
 - Templates requiring updates:
   - ✅ F:/data/dev/SpecDriven/.specify/templates/plan-template.md
@@ -78,13 +77,74 @@ HTTP status codes MUST communicate whether the error is retryable:
 Rationale: Clients need deterministic retry logic without bespoke flags. HTTP already defines the
 retry contract.
 
-### 5) Spring Boot & Gradle Consistency
-The project MUST follow Spring Boot and Gradle conventions:
-- Keep application wiring/configuration in Spring (no custom DI containers)
-- Prefer Spring idioms (validation, exception handling via `@ControllerAdvice`, etc.)
-- Use Gradle as the single source of build truth
+### 5) Spring-First Development
+The project MUST leverage Spring Boot's annotations, conventions, and capabilities as the primary approach to implementation.
 
-Rationale: Consistency lowers cognitive load and keeps tooling straightforward.
+**Core Requirements**:
+- Keep application wiring/configuration in Spring (no custom DI containers)
+- Use Gradle as the single source of build truth
+- Prefer Spring idioms over custom solutions
+
+**Mandatory Spring Usage**:
+
+*Dependency Injection & Component Scanning*:
+- Use `@Component`, `@Service`, `@Repository`, `@Controller`, `@RestController` for bean registration
+- Use constructor injection (preferred) or `@Autowired` for dependencies
+- Avoid field injection except in tests
+- Use `@Configuration` classes for complex bean wiring
+
+*Web Layer*:
+- Use `@RestController` + `@RequestMapping`/`@GetMapping`/`@PostMapping` etc. for HTTP endpoints
+- Use `@RequestBody`, `@RequestParam`, `@PathVariable`, `@RequestHeader` for input binding
+- Use `@ResponseStatus` for default status codes
+- Use `@ControllerAdvice` + `@ExceptionHandler` for centralized error handling (REQUIRED for stable error code contract)
+
+*Validation*:
+- Use `@Valid` or `@Validated` on controller method parameters
+- Use Bean Validation annotations (`@NotNull`, `@NotBlank`, `@Size`, `@Email`, `@Pattern`, etc.) on DTOs
+- Implement custom validators via `ConstraintValidator` when needed
+
+*Configuration & Properties*:
+- Use `@ConfigurationProperties` for type-safe configuration binding
+- Use `@Value` for simple property injection
+- Feature flags MUST use Spring properties: `FeatureFlag.<featureName>` injected via `@Value` or `@ConfigurationProperties`
+- Use profiles (`@Profile`) for environment-specific behavior when appropriate
+
+*Security*:
+- Use Spring Security annotations (`@PreAuthorize`, `@Secured`, `@RolesAllowed`) for authorization
+- Configure security via `SecurityFilterChain` beans (not deprecated `WebSecurityConfigurerAdapter`)
+- Use Spring Security's authentication mechanisms (JWT, OAuth2, etc.)
+
+*Data Access*:
+- Use Spring Data repositories (`JpaRepository`, `CrudRepository`, `JdbcTemplate`) for database operations
+- Use `@Transactional` for transaction management
+- Use `@Entity`, `@Table`, `@Column` for JPA entities when applicable
+- Use Spring's declarative transaction management (not manual transaction handling)
+
+*Testing*:
+- Use `@SpringBootTest` for integration tests with full application context
+- Use `@WebMvcTest` for controller layer tests
+- Use `@DataJpaTest` for repository layer tests
+- Use `@MockBean` for replacing beans in tests
+- Use `MockMvc` for testing HTTP endpoints
+
+*Scheduling & Async*:
+- Use `@Scheduled` for periodic tasks
+- Use `@Async` for asynchronous execution
+- Use `@EnableScheduling` and `@EnableAsync` to activate features
+
+*Caching*:
+- Use `@Cacheable`, `@CachePut`, `@CacheEvict` for declarative caching when needed
+- Use `@EnableCaching` to activate caching support
+
+**Anti-patterns to Avoid**:
+- Manual bean instantiation when Spring can inject
+- Custom request routing or parsing when Spring MVC provides it
+- Manual transaction management when `@Transactional` suffices
+- Custom validation frameworks when Bean Validation is sufficient
+- Scattered try-catch for HTTP errors when `@ControllerAdvice` should centralize it
+
+Rationale: Spring provides battle-tested, well-documented solutions for common patterns. Using Spring consistently reduces cognitive load, improves maintainability, leverages community knowledge, and ensures the codebase follows industry standards. Custom solutions should only be introduced when Spring's capabilities are genuinely insufficient.
 
 ### 6) Public API Compatibility: No Versioning + No Breaking Changes
 Public APIs MUST be stable and unversioned.
@@ -180,10 +240,12 @@ A change is “done” only when all are true:
 
 ### Review Expectations
 Reviewers MUST verify:
-- OpenAPI is the diff-of-record for API changes; generated code wasn’t hand-edited
+- OpenAPI is the diff-of-record for API changes; generated code wasn't hand-edited
 - Tests cover the new behavior and failure modes (especially negative/error cases)
 - Error codes are clear, stable, and consistent
 - HTTP status codes correctly reflect the error class (4xx vs 5xx, retry guidance via headers)
+- Spring annotations and capabilities are used appropriately (see Principle 5: Spring-First Development)
+- No custom solutions where Spring provides equivalent functionality
 - Any performance-sensitive path is measured/guarded
 - Public API changes are additive-only and do not introduce explicit API versioning
 - New features are guarded by `FeatureFlag.<featureName>` and can be toggled via Spring properties
@@ -212,4 +274,4 @@ Reviewers MUST verify:
 - At least quarterly (or when repeated exceptions occur), review whether rules are still correct
   and feasible.
 
-**Version**: 1.4.0 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date unknown | **Last Amended**: 2025-12-27
+**Version**: 1.5.0 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date unknown | **Last Amended**: 2025-12-30

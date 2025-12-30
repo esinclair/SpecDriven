@@ -8,6 +8,11 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
+**Spring-first development**: Tasks MUST use Spring Boot annotations and capabilities (dependency
+injection, `@Valid` validation, `@ControllerAdvice` exception handling, Spring Data repositories,
+Spring Security, `@Transactional`, etc.) rather than custom solutions. Document deviations with
+justification in tasks or plan.
+
 **Tests**: Tests are MANDATORY. Tasks MUST include unit + integration tests for happy paths AND
 negative/error flows (invalid inputs, error responses, exception paths), aligned with the OpenAPI
 contract and HTTP status semantics.

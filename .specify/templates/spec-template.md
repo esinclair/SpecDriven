@@ -16,6 +16,11 @@
   - Positive scenarios (happy path)
   - Negative scenarios (invalid inputs, error responses, exception paths)
 
+  Spring-first development:
+  Implementation should leverage Spring Boot annotations and capabilities (validation via `@Valid`,
+  exception handling via `@ControllerAdvice`, Spring Data repositories, Spring Security, etc.).
+  Document in plan.md how Spring features will be used to implement these scenarios.
+
   When an endpoint may return more than one item (list/array), the API MUST use a paged result set
   and the OpenAPI contract MUST require pagination inputs and define paging metadata in the response.
 

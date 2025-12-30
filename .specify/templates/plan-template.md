@@ -33,6 +33,9 @@
 
 - Tests are mandatory: plan includes unit + integration tests for happy paths AND exception/
   alternative flows.
+- Spring-first development: plan leverages Spring Boot annotations and capabilities (DI, validation,
+  exception handling via `@ControllerAdvice`, Spring Data, Spring Security, etc.) rather than custom
+  solutions. Document any intentional deviation with justification.
 - Performance budget: identify any synchronous paths and how they will meet the ≤1s response goal
   (or explicitly redesign as async/paginated/etc.).
 - Paged results: if any endpoint may return more than one item, the plan uses a paged result set and

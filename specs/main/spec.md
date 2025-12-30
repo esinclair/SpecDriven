@@ -58,9 +58,8 @@ As an API consumer, I want to authenticate with valid credentials and receive a 
 1. **Given** I submit login credentials with an unknown username, **When** the system responds, **Then** the response is **400** with an error that does not reveal whether the username exists.
 2. **Given** I submit login credentials with an incorrect password, **When** the system responds, **Then** the response is **400** with the same error code and message as an unknown username (non-enumerating).
 3. **Given** I submit login credentials missing required fields or with invalid formats, **When** the system responds, **Then** the response is **400** with a validation error code.
-4. **Given** the system has at least one user, **When** I attempt to create a user without authentication, **Then** the response is **401** indicating authentication is required.
-5. **Given** I include a malformed Authorization header, **When** accessing a protected endpoint, **Then** the response is **401** with an authentication error.
-6. **Given** I include an expired or invalid bearer token, **When** accessing a protected endpoint, **Then** the response is **401** with an authentication error.
+4. **Given** I include a malformed Authorization header, **When** accessing a protected endpoint, **Then** the response is **401** with an authentication error.
+5. **Given** I include an expired or invalid bearer token, **When** accessing a protected endpoint, **Then** the response is **401** with an authentication error.
 
 ---
 
@@ -84,7 +83,7 @@ As an authenticated API consumer, I want to create new users and retrieve user d
 2. **Given** I attempt to create a user with invalid field formats, **When** the system validates the request, **Then** the response is **400** with a validation error code.
 3. **Given** I attempt to create a user with an email address that already exists, **When** the system processes the request, **Then** the response is **409** with a conflict error code.
 4. **Given** I attempt to retrieve a user with an ID that does not exist, **When** the system processes the request, **Then** the response is **404** with a not-found error code.
-5. **Given** I am not authenticated, **When** I attempt to create or retrieve a user (after bootstrap), **Then** the response is **401** with an authentication error.
+5. **Given** I am not authenticated, **When** I attempt to create or retrieve a user, **Then** the response is **401** with an authentication error.
 6. **Given** a database connection failure occurs, **When** I attempt to create or retrieve a user, **Then** the response is **503** with an error indicating temporary unavailability and optionally includes a Retry-After header.
 
 ---
@@ -291,11 +290,11 @@ As a system administrator, I want to control feature availability via configurat
 - **FR-048**: Requests to protected endpoints with malformed Authorization headers MUST return **401** with an authentication error.
 - **FR-049**: Requests to protected endpoints with expired or invalid tokens MUST return **401** with an authentication error.
 
-#### Bootstrap Mode
+#### Protected Endpoints
 
-- **FR-050**: When the system has zero users, creating a user MUST NOT require authentication (bootstrap mode).
-- **FR-051**: When the system has at least one user, creating a user MUST require authentication.
-- **FR-052**: All other user management operations MUST always require authentication regardless of user count.
+- **FR-050**: All user management operations (create, retrieve, update, delete, list, role assignment) MUST require authentication.
+- **FR-051**: The health check endpoint MUST NOT require authentication.
+- **FR-052**: The login endpoint MUST NOT require authentication.
 
 #### User Management - Create
 
@@ -425,7 +424,7 @@ As a system administrator, I want to control feature availability via configurat
 
 - **SC-008 (Retry Semantics)**: For a test suite of transient failures, 100% of responses use **503** status codes and no error responses contain custom retry fields; retry behavior is determinable solely from HTTP status codes.
 
-- **SC-009 (Bootstrap Mode)**: When zero users exist, creating a user without authentication succeeds with **201**; when at least one user exists, creating a user without authentication fails with **401**.
+- **SC-009 (Authentication Requirements)**: All user management operations (create, retrieve, update, delete, list, role assignment) fail with **401** when attempted without authentication; the health check and login endpoints are accessible without authentication.
 
 - **SC-010 (Feature Flags)**: When the user management feature flag is disabled, all gated endpoints return **404**; when enabled, endpoints process requests normally; the health check is always available regardless of feature flag state.
 
@@ -461,7 +460,7 @@ As a system administrator, I want to control feature availability via configurat
 - The 1-second performance budget is measured end-to-end from request receipt to response sent under normal conditions.
 - Pagination uses zero-based or one-based page numbering (to be specified in OpenAPI contract); page size limits are documented in the contract.
 - When listing users with no matches, the API returns an empty result set with valid pagination metadata, not an error.
-- Authentication is required for all user management operations except: health check (never requires auth) and first user creation (allowed without auth only when zero users exist).
+- Authentication is required for all user management operations; the health check and login endpoints do not require authentication.
 - The login endpoint is gated by the same feature flag as other user management endpoints.
 - Transient database connection failures are retryable and return **503**; validation and business logic errors are not retryable and return **4xx**.
 - The system does not implement rate limiting in the initial version; rate limiting may be added in future iterations.

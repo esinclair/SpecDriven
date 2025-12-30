@@ -20,6 +20,18 @@
   ============================================================================
 -->
 
+## Spring-First Development (if applicable)
+
+- [ ] CHK000 Uses Spring annotations for dependency injection (`@Component`, `@Service`, `@Repository`, `@Controller`, `@RestController`)
+- [ ] CHK000 Uses Spring MVC annotations for HTTP endpoints (`@RequestMapping`, `@GetMapping`, `@PostMapping`, etc.)
+- [ ] CHK000 Uses `@Valid` or `@Validated` with Bean Validation annotations for input validation
+- [ ] CHK000 Uses `@ControllerAdvice` + `@ExceptionHandler` for centralized error handling
+- [ ] CHK000 Uses Spring Data repositories or `JdbcTemplate` for database operations (not manual JDBC)
+- [ ] CHK000 Uses `@Transactional` for transaction management (not manual transaction handling)
+- [ ] CHK000 Uses Spring Security annotations for authorization when applicable
+- [ ] CHK000 Uses `@ConfigurationProperties` or `@Value` for configuration injection
+- [ ] CHK000 No custom solutions where Spring provides equivalent functionality (or deviation documented)
+
 ## Public API Compatibility (if applicable)
 
 - [ ] CHK000 No explicit API versioning added (no `/v1` paths; no version headers/query params/media types)
