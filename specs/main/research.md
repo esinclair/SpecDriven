@@ -429,24 +429,13 @@ This document captures the technical research and decision-making process for im
 
 ### Query Optimization
 
-**Decision**: Use Spring Data JDBC projections and custom queries
+**Decision**: Use Spring Data JDBC projections without custom queries
 
 **Rationale**:
 - Avoid N+1 queries by fetching roles with users in single query
-- Use JOIN when loading user with roles
 - Paginate at database level with LIMIT/OFFSET
 - Filter at database level (not in Java code)
-
-**Example Query**:
-```sql
-SELECT u.*, r.role_name 
-FROM users u
-LEFT JOIN user_roles ur ON u.id = ur.user_id
-LEFT JOIN roles r ON ur.role_id = r.id
-WHERE u.email_address = :email
-LIMIT :limit OFFSET :offset
-```
-
+- Use projections to select only necessary fields
 ---
 
 ## Security Best Practices

@@ -51,7 +51,6 @@ As an API consumer, I want to authenticate with valid credentials and receive a 
 
 1. **Given** a user exists with known credentials, **When** I submit the correct username and password to the login endpoint, **Then** the response is **200** with a valid bearer token.
 2. **Given** a valid bearer token, **When** I include it in the Authorization header of a protected request, **Then** the request is authenticated and processed normally.
-3. **Given** the system has zero users, **When** I attempt to create the first user without authentication, **Then** the request succeeds (bootstrap mode).
 
 **Negative/Error Scenarios**:
 
@@ -233,7 +232,6 @@ As a system administrator, I want to control feature availability via configurat
 - **Special characters in input**: Usernames, names, and emails containing special characters, Unicode, or extremely long strings are validated and rejected with appropriate errors.
 - **Password handling**: Passwords are never returned in responses; password fields are write-only and stored securely (hashed).
 - **Email uniqueness**: The system enforces email uniqueness across all users; attempts to create or update with duplicate emails return **409**.
-- **Bootstrap mode**: The system allows creating the first user without authentication, but requires authentication for all user operations once at least one user exists.
 - **Token expiration**: Expired tokens are rejected with **401** responses; clients must obtain new tokens by logging in again.
 - **Pagination boundaries**: Requesting pages beyond available data returns empty results with appropriate pagination metadata, not errors.
 - **Role enumeration**: Only predefined roles are valid; attempts to assign non-existent roles return **400**.

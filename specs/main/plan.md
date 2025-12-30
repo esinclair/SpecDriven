@@ -361,17 +361,6 @@ The application follows a classic layered architecture:
   - Returns 404 when feature disabled (no disclosure)
   - Health check endpoint explicitly bypasses feature flag check
 
-#### 6. Bootstrap Mode Pattern
-
-- **Problem**: Need to create first user without authentication (chicken-egg problem)
-- **Solution**: Conditional security based on user count
-- **Implementation**:
-  - `POST /users` has dual security: `security: [{bearerAuth: []}, {}]` in OpenAPI
-  - Custom security logic checks user count in database
-  - If count = 0, allow without auth
-  - If count > 0, require auth
-  - All other endpoints always require auth
-
 #### 7. Idempotent Operations Pattern
 
 - **Problem**: Role assignment/removal should be safe to retry
@@ -608,8 +597,6 @@ server:
 
 #### Edge Cases
 
-- ✅ Bootstrap mode: create first user without auth succeeds
-- ✅ Post-bootstrap: create user without auth fails with 401
 - ✅ Login with unknown username returns same error as wrong password
 - ✅ Idempotent operations: assign/remove role multiple times
 - ✅ Pagination boundaries: last page, empty results
@@ -641,7 +628,7 @@ Examples:
 Tests requiring authentication must follow this setup pattern:
 
 1. **Check for existing test user**: Query the database to see if a test user already exists
-2. **Create user if needed**: If no test user exists, create one (this also tests bootstrap mode)
+2. **Create user if needed**: If no test user exists, create one
 3. **Login as test user**: Call the `/login` endpoint with test credentials to obtain an auth token
 4. **Use auth token**: Include the JWT bearer token in the `Authorization` header for subsequent API calls
 5. **Exercise endpoint under test**: Make the actual API call being tested with proper authentication
@@ -722,7 +709,6 @@ protected void ensureTestUserExists() {
 }
 ```
 
-**Bootstrap Mode Consideration**: The first user creation in a test won't require authentication (bootstrap mode), but subsequent operations will. Tests should handle this gracefully by checking for existing users first.
 
 **Test Isolation**: Each test class should use `@Transactional` or explicit database cleanup to ensure test independence, but may share a common test user setup via `@BeforeEach` or helper methods.
 
@@ -772,8 +758,7 @@ protected void ensureTestUserExists() {
 2. JWT authentication filter
 3. Login service (credential validation, token generation)
 4. Login controller implementation
-5. Bootstrap mode logic (user count check)
-6. Tests for login (happy path, invalid credentials, bootstrap mode)
+6. Tests for login (happy path, invalid credentials)
 
 **Priority 4: User Management CRUD**
 
@@ -805,7 +790,6 @@ protected void ensureTestUserExists() {
 2. Feature flag enabled/disabled tests for all endpoints
 3. Performance smoke tests
 4. Error response consistency verification
-5. Bootstrap mode integration test
 6. Full user lifecycle test (create → assign role → update → delete)
 
 ### Phase 3: Documentation & Validation ⏳
@@ -829,7 +813,6 @@ protected void ensureTestUserExists() {
 - [ ] Feature flag tests cover enabled and disabled states
 - [ ] Error responses use stable codes and consistent structure
 - [ ] No `retryable` field in any error response
-- [ ] Bootstrap mode logic tested (zero users vs one or more users)
 - [ ] Performance tests show ≤1s for 95% of operations
 - [ ] Pagination tested with multiple pages and empty results
 - [ ] Role operations tested for idempotency
@@ -891,14 +874,6 @@ A feature is complete when:
 - Integration tests override feature flag to `true` in test configuration
 - Separate tests verify flag disabled behavior (404 responses)
 - Documentation clearly states flag must be enabled for production
-
-### Risk: Bootstrap mode security bypass
-
-**Mitigation**:
-- Bootstrap mode only active when user count = 0 (atomic check)
-- After first user created, all operations require auth
-- Integration tests verify bootstrap mode ends after first user
-- No way to re-enter bootstrap mode without database reset
 
 ### Risk: JWT secret in configuration
 
