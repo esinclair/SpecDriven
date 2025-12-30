@@ -1,8 +1,8 @@
 # SpecDriven Application Configuration
 
 # Feature Flags
-FeatureFlag:
-  usersApi: false  # Default: disabled until validated
+feature-flag:
+  users-api: false  # Default: disabled until validated
 
 # JWT Configuration
 jwt:

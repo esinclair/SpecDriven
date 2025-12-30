@@ -136,6 +136,10 @@ tasks.named('processResources') {
     dependsOn tasks.named('openApiGenerate')
 }
 
+tasks.named('processTestResources') {
+    dependsOn tasks.named('openApiGenerate')
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }

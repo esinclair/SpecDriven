@@ -28,14 +28,14 @@
 
 **Purpose**: Project initialization, build configuration, and basic structure
 
-- [ ] T001 Verify Spring Boot project structure exists with src/main/java, src/main/resources, src/test/java
-- [ ] T002 Configure build.gradle with Spring Boot 3.5.9, Spring Web, Spring Data JDBC, Spring Security, JWT (jjwt 0.12.3), Flyway, H2, OpenAPI Generator 7.14.0
-- [ ] T003 [P] Setup OpenAPI Generator Gradle plugin to generate code from src/main/resources/openapi.yaml to src/main-gen/java
-- [ ] T004 [P] Copy contracts/openapi.contract.yaml to src/main/resources/openapi.yaml
-- [ ] T005 [P] Create application.yml in src/main/resources with database config (H2 in PostgreSQL mode), feature flag config (FeatureFlag.usersApi: false), JWT config, server config
-- [ ] T006 [P] Create application-test.yml in src/test/resources with test-specific configuration (H2, feature flag overrides)
-- [ ] T007 Run ./gradlew openApiGenerate to verify code generation works and produces interfaces in src/main-gen/java
-- [ ] T008 Create SpecDrivenApplication.java main class in src/main/java/com/example/specdriven/SpecDrivenApplication.java with @SpringBootApplication
+- [X] T001 Verify Spring Boot project structure exists with src/main/java, src/main/resources, src/test/java
+- [X] T002 Configure build.gradle with Spring Boot 3.5.9, Spring Web, Spring Data JDBC, Spring Security, JWT (jjwt 0.12.3), Flyway, H2, OpenAPI Generator 7.14.0
+- [X] T003 [P] Setup OpenAPI Generator Gradle plugin to generate code from src/main/resources/openapi.yaml to src/main-gen/java
+- [X] T004 [P] Copy contracts/openapi.contract.yaml to src/main/resources/openapi.yaml
+- [X] T005 [P] Create application.yml in src/main/resources with database config (H2 in PostgreSQL mode), feature flag config (FeatureFlag.usersApi: false), JWT config, server config
+- [X] T006 [P] Create application-test.yml in src/test/resources with test-specific configuration (H2, feature flag overrides)
+- [X] T007 Run ./gradlew openApiGenerate to verify code generation works and produces interfaces in src/main-gen/java
+- [X] T008 Create SpecDrivenApplication.java main class in src/main/java/com/example/specdriven/SpecDrivenApplication.java with @SpringBootApplication
 
 ---
 
@@ -47,43 +47,43 @@
 
 ### Database & Migrations
 
-- [ ] T009 Create Flyway migration V001__init_schema.sql in src/main/resources/db/migration creating users table with columns: id (UUID PK), username (VARCHAR 100), name (VARCHAR 255), email_address (VARCHAR 255 UNIQUE), password_hash (VARCHAR 255), created_at (TIMESTAMP), updated_at (TIMESTAMP), plus indexes on email_address and username
-- [ ] T010 [P] Create Flyway migration V002__roles_permissions.sql in src/main/resources/db/migration creating roles table, permissions table, role_permissions join table, and inserting predefined roles (ADMIN, USER, GUEST) and permissions (users:read, users:write, users:delete, roles:assign)
-- [ ] T011 [P] Create Flyway migration V003__users_api.sql in src/main/resources/db/migration creating user_roles join table with columns: user_id (UUID FK), role_id (UUID FK), assigned_at (TIMESTAMP), plus composite PK and indexes
+- [X] T009 Create Flyway migration V001__init_schema.sql in src/main/resources/db/migration creating users table with columns: id (UUID PK), username (VARCHAR 100), name (VARCHAR 255), email_address (VARCHAR 255 UNIQUE), password_hash (VARCHAR 255), created_at (TIMESTAMP), updated_at (TIMESTAMP), plus indexes on email_address and username
+- [X] T010 [P] Create Flyway migration V002__roles_permissions.sql in src/main/resources/db/migration creating roles table, permissions table, role_permissions join table, and inserting predefined roles (ADMIN, USER, GUEST) and permissions (users:read, users:write, users:delete, roles:assign)
+- [X] T011 [P] Create Flyway migration V003__users_api.sql in src/main/resources/db/migration creating user_roles join table with columns: user_id (UUID FK), role_id (UUID FK), assigned_at (TIMESTAMP), plus composite PK and indexes
 
 ### Domain Entities
 
-- [ ] T012 [P] Create UserEntity.java in src/main/java/com/example/specdriven/domain/UserEntity.java with Spring Data JDBC annotations (@Table, @Id, @Column) for users table
-- [ ] T013 [P] Create RoleEntity.java in src/main/java/com/example/specdriven/domain/RoleEntity.java with annotations for roles table
-- [ ] T014 [P] Create PermissionEntity.java in src/main/java/com/example/specdriven/domain/PermissionEntity.java with annotations for permissions table
-- [ ] T015 [P] Create UserRoleEntity.java in src/main/java/com/example/specdriven/domain/UserRoleEntity.java with composite key annotations for user_roles join table
-- [ ] T016 [P] Create RolePermissionEntity.java in src/main/java/com/example/specdriven/domain/RolePermissionEntity.java with composite key annotations for role_permissions join table
+- [X] T012 [P] Create UserEntity.java in src/main/java/com/example/specdriven/domain/UserEntity.java with Spring Data JDBC annotations (@Table, @Id, @Column) for users table
+- [X] T013 [P] Create RoleEntity.java in src/main/java/com/example/specdriven/domain/RoleEntity.java with annotations for roles table
+- [X] T014 [P] Create PermissionEntity.java in src/main/java/com/example/specdriven/domain/PermissionEntity.java with annotations for permissions table
+- [X] T015 [P] Create UserRoleEntity.java in src/main/java/com/example/specdriven/domain/UserRoleEntity.java with composite key annotations for user_roles join table
+- [X] T016 [P] Create RolePermissionEntity.java in src/main/java/com/example/specdriven/domain/RolePermissionEntity.java with composite key annotations for role_permissions join table
 
 ### Repositories
 
-- [ ] T017 [P] Create UserRepository.java interface in src/main/java/com/example/specdriven/repository/UserRepository.java extending PagingAndSortingRepository<UserEntity, UUID> with derived query methods: findByEmailAddress (Spring will generate query from method name)
-- [ ] T018 [P] Create RoleRepository.java interface in src/main/java/com/example/specdriven/repository/RoleRepository.java extending CrudRepository<RoleEntity, UUID> with findByRoleName method
-- [ ] T019 [P] Create UserRoleRepository.java interface in src/main/java/com/example/specdriven/repository/UserRoleRepository.java extending CrudRepository<UserRoleEntity, ?> with findByUserId, deleteByUserIdAndRoleId methods
+- [X] T017 [P] Create UserRepository.java interface in src/main/java/com/example/specdriven/repository/UserRepository.java extending PagingAndSortingRepository<UserEntity, UUID> with derived query methods: findByEmailAddress (Spring will generate query from method name)
+- [X] T018 [P] Create RoleRepository.java interface in src/main/java/com/example/specdriven/repository/RoleRepository.java extending CrudRepository<RoleEntity, UUID> with findByRoleName method
+- [X] T019 [P] Create UserRoleRepository.java interface in src/main/java/com/example/specdriven/repository/UserRoleRepository.java extending CrudRepository<UserRoleEntity, ?> with findByUserId, deleteByUserIdAndRoleId methods
 
 ### Exception Framework
 
-- [ ] T020 [P] Create ValidationException.java in src/main/java/com/example/specdriven/exception/ValidationException.java extending RuntimeException
-- [ ] T021 [P] Create ResourceNotFoundException.java in src/main/java/com/example/specdriven/exception/ResourceNotFoundException.java extending RuntimeException
-- [ ] T022 [P] Create ConflictException.java in src/main/java/com/example/specdriven/exception/ConflictException.java extending RuntimeException
-- [ ] T023 [P] Create AuthenticationException.java in src/main/java/com/example/specdriven/exception/AuthenticationException.java extending RuntimeException
-- [ ] T024 Create ErrorResponseFactory.java in src/main/java/com/example/specdriven/exception/ErrorResponseFactory.java with static methods to create ErrorResponse objects with stable codes: VALIDATION_FAILED, RESOURCE_NOT_FOUND, CONFLICT, AUTHENTICATION_REQUIRED, AUTHENTICATION_FAILED, INTERNAL_ERROR, SERVICE_UNAVAILABLE
-- [ ] T025 Create GlobalExceptionHandler.java in src/main/java/com/example/specdriven/exception/GlobalExceptionHandler.java with @ControllerAdvice and @ExceptionHandler methods mapping exceptions to HTTP status codes and ErrorResponse objects
+- [X] T020 [P] Create ValidationException.java in src/main/java/com/example/specdriven/exception/ValidationException.java extending RuntimeException
+- [X] T021 [P] Create ResourceNotFoundException.java in src/main/java/com/example/specdriven/exception/ResourceNotFoundException.java extending RuntimeException
+- [X] T022 [P] Create ConflictException.java in src/main/java/com/example/specdriven/exception/ConflictException.java extending RuntimeException
+- [X] T023 [P] Create AuthenticationException.java in src/main/java/com/example/specdriven/exception/AuthenticationException.java extending RuntimeException
+- [X] T024 Create ErrorResponseFactory.java in src/main/java/com/example/specdriven/exception/ErrorResponseFactory.java with static methods to create ErrorResponse objects with stable codes: VALIDATION_FAILED, RESOURCE_NOT_FOUND, CONFLICT, AUTHENTICATION_REQUIRED, AUTHENTICATION_FAILED, INTERNAL_ERROR, SERVICE_UNAVAILABLE
+- [X] T025 Create GlobalExceptionHandler.java in src/main/java/com/example/specdriven/exception/GlobalExceptionHandler.java with @ControllerAdvice and @ExceptionHandler methods mapping exceptions to HTTP status codes and ErrorResponse objects
 
 ### Security Configuration
 
-- [ ] T026 Create JwtConfig.java in src/main/java/com/example/specdriven/config/JwtConfig.java with @ConfigurationProperties("jwt") for secret and expirationMs
-- [ ] T027 Create SecurityConfig.java in src/main/java/com/example/specdriven/config/SecurityConfig.java with @Configuration @EnableWebSecurity configuring SecurityFilterChain to permit /ping, /login without auth and require auth for /users/**
-- [ ] T028 [P] Create PasswordEncoderConfig.java in src/main/java/com/example/specdriven/config/PasswordEncoderConfig.java with @Configuration and @Bean for BCryptPasswordEncoder
+- [X] T026 Create JwtConfig.java in src/main/java/com/example/specdriven/config/JwtConfig.java with @ConfigurationProperties("jwt") for secret and expirationMs
+- [X] T027 Create SecurityConfig.java in src/main/java/com/example/specdriven/config/SecurityConfig.java with @Configuration @EnableWebSecurity configuring SecurityFilterChain to permit /ping, /login without auth and require auth for /users/**
+- [X] T028 [P] Create PasswordEncoderConfig.java in src/main/java/com/example/specdriven/config/PasswordEncoderConfig.java with @Configuration and @Bean for BCryptPasswordEncoder
 
 ### Feature Flag Infrastructure
 
-- [ ] T029 Create FeatureFlagConfig.java in src/main/java/com/example/specdriven/config/FeatureFlagConfig.java with @ConfigurationProperties("FeatureFlag") containing boolean usersApi field with default false
-- [ ] T030 Create FeatureFlagService.java in src/main/java/com/example/specdriven/service/FeatureFlagService.java with @Service injecting FeatureFlagConfig and methods to check feature states
+- [X] T029 Create FeatureFlagConfig.java in src/main/java/com/example/specdriven/config/FeatureFlagConfig.java with @ConfigurationProperties("FeatureFlag") containing boolean usersApi field with default false
+- [X] T030 Create FeatureFlagService.java in src/main/java/com/example/specdriven/service/FeatureFlagService.java with @Service injecting FeatureFlagConfig and methods to check feature states
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
