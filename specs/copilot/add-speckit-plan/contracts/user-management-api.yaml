@@ -1,0 +1,789 @@
+openapi: 3.0.1
+info:
+  title: User Management API
+  description: |
+    REST API for managing users and their roles. Demonstrates OpenAPI-first development with 
+    Spring Boot, featuring JWT authentication, stable error codes, HTTP-based retry semantics, 
+    and comprehensive validation.
+    
+    **Key Features:**
+    - Complete user lifecycle management (CRUD operations)
+    - Role-based access control
+    - JWT bearer token authentication
+    - Feature flag support
+    - Paginated results for collections
+    - Stable error codes with HTTP status-based retry semantics
+    - No explicit API versioning (backward-compatible additive changes only)
+    
+    **Authentication:**
+    Protected endpoints require a valid JWT bearer token in the Authorization header:
+    `Authorization: Bearer <token>`
+    
+    Obtain a token by calling POST /login with valid credentials.
+    
+    **Error Handling:**
+    All error responses follow a consistent structure with stable error codes.
+    Retry behavior is indicated by HTTP status codes:
+    - 4xx: Client error, do not retry (except 429 with Retry-After)
+    - 5xx: Server error, may retry with backoff (use Retry-After header when present)
+    
+    **Feature Flags:**
+    All user management endpoints are gated by FeatureFlag.usersApi.
+    When disabled, endpoints return 404 with standard error response.
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+tags:
+  - name: Health
+    description: Health check endpoint for monitoring
+  - name: Authentication
+    description: User authentication and token management
+  - name: Users
+    description: User lifecycle management operations
+  - name: Roles
+    description: Role assignment and management operations
+
+paths:
+  /ping:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: |
+        Lightweight health check endpoint that returns successful response when service is running.
+        Does not require authentication or database connectivity.
+        Always available regardless of feature flag state.
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user
+      description: |
+        Authenticate with username and password to obtain a JWT bearer token.
+        Does not require prior authentication (public endpoint).
+        Gated by FeatureFlag.usersApi (returns 404 when disabled).
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Validation error or invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: AUTHENTICATION_FAILED
+                message: Invalid username or password
+        '404':
+          description: Feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    post:
+      tags:
+        - Users
+      summary: Create user
+      description: |
+        Create a new user with the provided data.
+        Requires authentication unless database is empty (bootstrap mode).
+        Email address must be unique across all users.
+        Password is hashed before storage and never returned in responses.
+        Gated by FeatureFlag.usersApi.
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: VALIDATION_FAILED
+                message: Validation failed
+                details:
+                  emailAddress: must be a well-formed email address
+        '401':
+          description: Authentication required or failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict (e.g., duplicate email)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: CONFLICT
+                message: Email address already exists
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags:
+        - Users
+      summary: List users
+      description: |
+        Retrieve a paginated list of users with optional filtering.
+        Requires authentication.
+        Pagination parameters are mandatory.
+        Gated by FeatureFlag.usersApi.
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
+        - name: pageSize
+          in: query
+          description: Number of items per page
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            example: 20
+        - name: username
+          in: query
+          description: Filter by username (partial match)
+          required: false
+          schema:
+            type: string
+            example: john
+        - name: emailAddress
+          in: query
+          description: Filter by email address (partial match)
+          required: false
+          schema:
+            type: string
+            example: john@example.com
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedUserResponse'
+        '400':
+          description: Validation error (e.g., invalid pagination parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required or failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: |
+        Retrieve a specific user by their unique ID.
+        Requires authentication.
+        Password field is never included in response.
+        Gated by FeatureFlag.usersApi.
+      operationId: getUserById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Authentication required or failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found or feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: RESOURCE_NOT_FOUND
+                message: User not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: |
+        Update an existing user's information.
+        Requires authentication.
+        User ID cannot be modified (system-controlled field).
+        Email address must remain unique.
+        If password is provided, it will be hashed before storage.
+        Gated by FeatureFlag.usersApi.
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required or failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found or feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict (e.g., duplicate email)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: |
+        Delete a user by their unique ID.
+        Requires authentication.
+        All role assignments for the user are also deleted (cascade).
+        Gated by FeatureFlag.usersApi.
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        '204':
+          description: User deleted successfully
+        '401':
+          description: Authentication required or failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found or feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{userId}/roles/{roleName}:
+    post:
+      tags:
+        - Roles
+      summary: Assign role to user
+      description: |
+        Assign a role to a user.
+        Requires authentication.
+        Role name must be one of the predefined roles (ADMIN, USER, GUEST).
+        Operation is idempotent (no error if role already assigned).
+        Gated by FeatureFlag.usersApi.
+      operationId: assignRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: roleName
+          in: path
+          description: Role name
+          required: true
+          schema:
+            type: string
+            enum: [ADMIN, USER, GUEST]
+            example: USER
+      responses:
+        '204':
+          description: Role assigned successfully
+        '400':
+          description: Validation error (e.g., invalid role name)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: VALIDATION_FAILED
+                message: Invalid role name
+        '401':
+          description: Authentication required or failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found or feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Roles
+      summary: Remove role from user
+      description: |
+        Remove a role from a user.
+        Requires authentication.
+        Operation is idempotent (no error if role not assigned).
+        Gated by FeatureFlag.usersApi.
+      operationId: removeRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: roleName
+          in: path
+          description: Role name
+          required: true
+          schema:
+            type: string
+            enum: [ADMIN, USER, GUEST]
+            example: USER
+      responses:
+        '204':
+          description: Role removed successfully
+        '400':
+          description: Validation error (e.g., invalid role name)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required or failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found or feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token obtained from /login endpoint
+
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+      properties:
+        status:
+          type: string
+          example: UP
+          description: Health status
+        timestamp:
+          type: string
+          format: date-time
+          example: '2025-12-30T15:30:00Z'
+          description: Response timestamp
+
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: john.doe
+          description: Username for authentication
+        password:
+          type: string
+          minLength: 1
+          maxLength: 255
+          format: password
+          example: MySecurePassword123
+          description: Password for authentication
+
+    LoginResponse:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          description: JWT bearer token
+        tokenType:
+          type: string
+          example: Bearer
+          default: Bearer
+          description: Token type
+        expiresIn:
+          type: integer
+          example: 86400
+          description: Token expiration time in seconds
+
+    CreateUserRequest:
+      type: object
+      required:
+        - username
+        - name
+        - emailAddress
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: john.doe
+          description: Username (not unique)
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: John Doe
+          description: Full name or display name
+        emailAddress:
+          type: string
+          minLength: 1
+          maxLength: 255
+          format: email
+          example: john.doe@example.com
+          description: Email address (must be unique)
+        password:
+          type: string
+          minLength: 8
+          maxLength: 255
+          format: password
+          example: MySecurePassword123
+          description: Password (will be hashed before storage)
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: john.doe
+          description: Username (not unique)
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: John Doe
+          description: Full name or display name
+        emailAddress:
+          type: string
+          minLength: 1
+          maxLength: 255
+          format: email
+          example: john.doe@example.com
+          description: Email address (must be unique)
+        password:
+          type: string
+          minLength: 8
+          maxLength: 255
+          format: password
+          example: MySecurePassword123
+          description: New password (optional, will be hashed before storage)
+
+    UserResponse:
+      type: object
+      required:
+        - id
+        - username
+        - name
+        - emailAddress
+        - roles
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+          description: Unique user identifier (system-assigned)
+        username:
+          type: string
+          example: john.doe
+          description: Username
+        name:
+          type: string
+          example: John Doe
+          description: Full name or display name
+        emailAddress:
+          type: string
+          format: email
+          example: john.doe@example.com
+          description: Email address
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [ADMIN, USER, GUEST]
+          example: [USER]
+          description: Assigned roles
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-12-30T15:30:00Z'
+          description: User creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-12-30T15:30:00Z'
+          description: Last update timestamp
+
+    PagedUserResponse:
+      type: object
+      required:
+        - items
+        - page
+        - pageSize
+        - totalCount
+        - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+          description: Array of users for current page
+        page:
+          type: integer
+          minimum: 1
+          example: 1
+          description: Current page number (1-based)
+        pageSize:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 20
+          description: Number of items per page
+        totalCount:
+          type: integer
+          minimum: 0
+          example: 100
+          description: Total number of users across all pages
+        totalPages:
+          type: integer
+          minimum: 0
+          example: 5
+          description: Total number of pages
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - VALIDATION_FAILED
+            - RESOURCE_NOT_FOUND
+            - CONFLICT
+            - AUTHENTICATION_REQUIRED
+            - AUTHENTICATION_FAILED
+            - INTERNAL_ERROR
+            - SERVICE_UNAVAILABLE
+            - FEATURE_DISABLED
+          example: VALIDATION_FAILED
+          description: Stable error code for client handling
+        message:
+          type: string
+          example: Validation failed
+          description: Human-readable error message safe for display
+        details:
+          type: object
+          additionalProperties: true
+          example:
+            emailAddress: must be a well-formed email address
+          description: Optional additional diagnostic information
