@@ -40,6 +40,7 @@ public class SecurityConfig {
                 // Public endpoints (no authentication required)
                 .requestMatchers("/ping").permitAll()
                 .requestMatchers("/login").permitAll()
+                .requestMatchers("/test/**").permitAll() // Test endpoints for integration tests
                 .requestMatchers("/h2-console/**").permitAll() // H2 console for development
                 
                 // Protected endpoints (authentication required)

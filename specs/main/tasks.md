@@ -97,16 +97,16 @@
 
 ### Tests for User Story 1 (MANDATORY)
 
-- [ ] T031 [P] [US1] Create HealthCheckIntegrationTest.java in src/test/java/com/example/specdriven/integration/HealthCheckIntegrationTest.java with @SpringBootTest testing GET /ping returns 200 with PingResponse message
-- [ ] T032 [P] [US1] Add test in HealthCheckIntegrationTest.java: ping_NoAuthRequired_Returns200 verifying health check works without Authorization header
-- [ ] T033 [P] [US1] Add test in HealthCheckIntegrationTest.java: ping_FeatureFlagDisabled_StillReturns200 verifying health check works even when FeatureFlag.usersApi is false
-- [ ] T034 [P] [US1] Add test in HealthCheckIntegrationTest.java: ping_ResponseTime_Under1Second verifying 95% of requests complete in under 1 second
+- [X] T031 [P] [US1] Create HealthCheckIntegrationTest.java in src/test/java/com/example/specdriven/integration/HealthCheckIntegrationTest.java with @SpringBootTest testing GET /ping returns 200 with PingResponse message
+- [X] T032 [P] [US1] Add test in HealthCheckIntegrationTest.java: ping_NoAuthRequired_Returns200 verifying health check works without Authorization header
+- [X] T033 [P] [US1] Add test in HealthCheckIntegrationTest.java: ping_FeatureFlagDisabled_StillReturns200 verifying health check works even when FeatureFlag.usersApi is false
+- [X] T034 [P] [US1] Add test in HealthCheckIntegrationTest.java: ping_ResponseTime_Under1Second verifying 95% of requests complete in under 1 second
 
 ### Implementation for User Story 1
 
-- [ ] T035 [US1] Create PingController.java in src/main/java/com/example/specdriven/controller/PingController.java implementing generated PingApi interface with ping() method returning PingResponse with message "pong"
-- [ ] T036 [US1] Update SecurityConfig.java to explicitly permit /ping endpoint without authentication (configure in SecurityFilterChain)
-- [ ] T037 [US1] Ensure feature flag filter (to be implemented) bypasses /ping endpoint
+- [X] T035 [US1] Create PingController.java in src/main/java/com/example/specdriven/controller/PingController.java implementing generated PingApi interface with ping() method returning PingResponse with message "pong"
+- [X] T036 [US1] Update SecurityConfig.java to explicitly permit /ping endpoint without authentication (configure in SecurityFilterChain)
+- [X] T037 [US1] Ensure feature flag filter (to be implemented) bypasses /ping endpoint
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - health check endpoint works without auth or DB
 
@@ -120,19 +120,19 @@
 
 ### Tests for User Story 7+8 (MANDATORY)
 
-- [ ] T038 [P] [US7] Create ErrorHandlingIntegrationTest.java in src/test/java/com/example/specdriven/integration/ErrorHandlingIntegrationTest.java testing validation error returns 400 with VALIDATION_FAILED code
-- [ ] T039 [P] [US7] Add test in ErrorHandlingIntegrationTest.java: notFound_Returns404WithResourceNotFoundCode testing 404 errors return RESOURCE_NOT_FOUND code
-- [ ] T040 [P] [US7] Add test in ErrorHandlingIntegrationTest.java: conflict_Returns409WithConflictCode testing 409 errors return CONFLICT code
-- [ ] T041 [P] [US7] Add test in ErrorHandlingIntegrationTest.java: authenticationFailure_Returns401WithAuthenticationFailedCode testing 401 errors return AUTHENTICATION_FAILED code
-- [ ] T042 [P] [US8] Add test in ErrorHandlingIntegrationTest.java: errorResponse_NoRetryableField verifying error responses don't contain retryable field
-- [ ] T043 [P] [US8] Add test in ErrorHandlingIntegrationTest.java: serviceUnavailable_Returns503 testing transient errors return 503 with SERVICE_UNAVAILABLE code
+- [X] T038 [P] [US7] Create ErrorHandlingIntegrationTest.java in src/test/java/com/example/specdriven/integration/ErrorHandlingIntegrationTest.java testing validation error returns 400 with VALIDATION_FAILED code
+- [X] T039 [P] [US7] Add test in ErrorHandlingIntegrationTest.java: notFound_Returns404WithResourceNotFoundCode testing 404 errors return RESOURCE_NOT_FOUND code
+- [X] T040 [P] [US7] Add test in ErrorHandlingIntegrationTest.java: conflict_Returns409WithConflictCode testing 409 errors return CONFLICT code
+- [X] T041 [P] [US7] Add test in ErrorHandlingIntegrationTest.java: authenticationFailure_Returns401WithAuthenticationFailedCode testing 401 errors return AUTHENTICATION_FAILED code
+- [X] T042 [P] [US8] Add test in ErrorHandlingIntegrationTest.java: errorResponse_NoRetryableField verifying error responses don't contain retryable field
+- [X] T043 [P] [US8] Add test in ErrorHandlingIntegrationTest.java: serviceUnavailable_Returns503 testing transient errors return 503 with SERVICE_UNAVAILABLE code
 
 ### Implementation for User Story 7+8
 
-- [ ] T044 [US7] Complete GlobalExceptionHandler.java with all @ExceptionHandler methods: ValidationException → 400, ResourceNotFoundException → 404, ConflictException → 409, AuthenticationException → 401, DataAccessException → 503, Exception → 500
-- [ ] T045 [US7] Verify ErrorResponseFactory.java generates stable error codes and safe messages (no stack traces, no sensitive data)
-- [ ] T046 [US8] Add documentation comments in GlobalExceptionHandler.java explaining retry semantics: 4xx = don't retry, 5xx = may retry
-- [ ] T047 [US7] Update GlobalExceptionHandler.java to optionally include Retry-After header for 503 responses
+- [X] T044 [US7] Complete GlobalExceptionHandler.java with all @ExceptionHandler methods: ValidationException → 400, ResourceNotFoundException → 404, ConflictException → 409, AuthenticationException → 401, DataAccessException → 503, Exception → 500
+- [X] T045 [US7] Verify ErrorResponseFactory.java generates stable error codes and safe messages (no stack traces, no sensitive data)
+- [X] T046 [US8] Add documentation comments in GlobalExceptionHandler.java explaining retry semantics: 4xx = don't retry, 5xx = may retry
+- [X] T047 [US7] Update GlobalExceptionHandler.java to optionally include Retry-After header for 503 responses
 
 **Checkpoint**: Error handling is now consistent across all endpoints with stable codes and HTTP retry semantics
 
