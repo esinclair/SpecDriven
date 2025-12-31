@@ -175,12 +175,12 @@ class FullUserLifecycleIntegrationTest {
     }
 
     /**
-     * T160: Test that multiple users can perform independent operations without interference.
-     * Note: This test doesn't use @Transactional concurrent threads because transactions
-     * don't propagate across threads. Instead, it performs sequential independent operations.
+     * T160: Test that operations on multiple users don't interfere with each other.
+     * This validates data isolation - operations on one user don't affect others.
+     * Note: Uses sequential operations because @Transactional doesn't propagate across threads.
      */
     @Test
-    void multipleUsers_IndependentOperations() throws Exception {
+    void multipleUsers_OperationsDoNotInterfere() throws Exception {
         // Create multiple users
         List<UUID> userIds = new ArrayList<>();
         
