@@ -3,8 +3,7 @@ package com.example.specdriven.repository;
 import com.example.specdriven.domain.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -15,8 +14,7 @@ import java.util.UUID;
  * Provides CRUD operations, pagination, and custom query methods.
  */
 @Repository
-public interface UserRepository extends CrudRepository<UserEntity, UUID>, 
-                                       PagingAndSortingRepository<UserEntity, UUID> {
+public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
     /**
      * Find a user by email address.

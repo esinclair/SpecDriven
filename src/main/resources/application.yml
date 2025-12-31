@@ -16,7 +16,7 @@ spring:
 
   # Database Configuration (H2 in-memory)
   datasource:
-    url: jdbc:h2:mem:specdriven;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:specdriven;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -33,10 +33,15 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
-  # JDBC Configuration
-  jdbc:
-    template:
-      query-timeout: 5
+  # JPA/Hibernate Configuration
+  jpa:
+    hibernate:
+      ddl-auto: none  # Let Flyway handle schema
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
 
 # Server Configuration
 server:

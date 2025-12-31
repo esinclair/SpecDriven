@@ -1,8 +1,6 @@
 package com.example.specdriven.domain;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,29 +9,30 @@ import java.util.UUID;
  * Domain entity representing a user in the system.
  * Maps to the 'users' table in the database.
  */
-@Table("users")
+@Entity
+@Table(name = "users")
 public class UserEntity {
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
-    @Column("username")
+    @Column(name = "username")
     private String username;
 
-    @Column("name")
+    @Column(name = "name")
     private String name;
 
-    @Column("email_address")
+    @Column(name = "email_address")
     private String emailAddress;
 
-    @Column("password_hash")
+    @Column(name = "password_hash")
     private String passwordHash;
 
-    @Column("created_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column("updated_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     // Constructors
