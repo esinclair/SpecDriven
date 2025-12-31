@@ -7,9 +7,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import jakarta.validation.ConstraintViolationException;
 
 /**
  * Global exception handler for the application.
@@ -49,6 +54,67 @@ public class GlobalExceptionHandler {
             message += ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         }
         logger.warn("Method argument validation failed: {}", message);
+        ErrorResponse error = ErrorResponseFactory.validationFailed(message);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle missing required request parameters (400 Bad Request).
+     * Client should not retry without providing the required parameters.
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex, WebRequest request) {
+        String message = "Required parameter '" + ex.getParameterName() + "' is missing";
+        logger.warn("Missing request parameter: {}", message);
+        ErrorResponse error = ErrorResponseFactory.validationFailed(message);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle constraint violation exceptions (400 Bad Request).
+     * Client should not retry without fixing validation errors.
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(
+            ConstraintViolationException ex, WebRequest request) {
+        String message = "Validation failed: " + ex.getMessage();
+        logger.warn("Constraint violation: {}", message);
+        ErrorResponse error = ErrorResponseFactory.validationFailed(message);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle handler method validation exceptions (400 Bad Request).
+     * Used for @Valid on controller method parameters.
+     */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleHandlerMethodValidation(
+            HandlerMethodValidationException ex, WebRequest request) {
+        String message = "Validation failed";
+        if (!ex.getAllErrors().isEmpty()) {
+            message = "Validation failed: " + ex.getAllErrors().get(0).getDefaultMessage();
+        }
+        logger.warn("Handler method validation failed: {}", message);
+        ErrorResponse error = ErrorResponseFactory.validationFailed(message);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle type mismatch exceptions (400 Bad Request).
+     * Occurs when Spring cannot convert a parameter to the expected type (e.g., invalid enum value).
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex, WebRequest request) {
+        String message = "Invalid value for parameter '" + ex.getName() + "'";
+        if (ex.getRequiredType() != null && ex.getRequiredType().isEnum()) {
+            Object[] enumConstants = ex.getRequiredType().getEnumConstants();
+            if (enumConstants != null) {
+                message += ". Valid values are: " + java.util.Arrays.toString(enumConstants);
+            }
+        }
+        logger.warn("Type mismatch: {}", message);
         ErrorResponse error = ErrorResponseFactory.validationFailed(message);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }

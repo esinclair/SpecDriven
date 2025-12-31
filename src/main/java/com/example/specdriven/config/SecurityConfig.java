@@ -2,6 +2,7 @@ package com.example.specdriven.config;
 
 import com.example.specdriven.api.model.ErrorResponse;
 import com.example.specdriven.exception.ErrorResponseFactory;
+import com.example.specdriven.security.FeatureFlagSecurityFilter;
 import com.example.specdriven.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,10 +20,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Spring Security configuration for the application.
  * Configures authentication, authorization, and security filters.
  * 
+ * Filter Chain Order:
+ * 1. FeatureFlagSecurityFilter - Gates endpoints based on feature flag
+ * 2. JwtAuthenticationFilter - Validates JWT tokens
+ * 3. UsernamePasswordAuthenticationFilter (Spring's default)
+ * 
  * Security Rules:
- * - /ping: Always accessible (no authentication required)
- * - /login: Accessible without authentication
- * - /users/**: Requires authentication (JWT bearer token) for all operations
+ * - /ping: Always accessible (no authentication required, bypasses feature flag)
+ * - /login: Accessible without authentication (gated by feature flag)
+ * - /users/**: Requires authentication (JWT bearer token), gated by feature flag
  * - All other endpoints: Require authentication by default
  */
 @Configuration
@@ -30,10 +36,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final FeatureFlagSecurityFilter featureFlagSecurityFilter;
     private final ObjectMapper objectMapper;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, ObjectMapper objectMapper) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          FeatureFlagSecurityFilter featureFlagSecurityFilter,
+                          ObjectMapper objectMapper) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.featureFlagSecurityFilter = featureFlagSecurityFilter;
         this.objectMapper = objectMapper;
     }
 
@@ -86,6 +96,9 @@ public class SecurityConfig {
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin())
             )
+            
+            // Add FeatureFlagSecurityFilter first (before JWT filter)
+            .addFilterBefore(featureFlagSecurityFilter, UsernamePasswordAuthenticationFilter.class)
             
             // Add JWT authentication filter before UsernamePasswordAuthenticationFilter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
