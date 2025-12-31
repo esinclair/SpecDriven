@@ -184,7 +184,9 @@ class UserRepositoryTest {
 
     private UserEntity createTestUser(String username, String email) {
         UserEntity user = new UserEntity();
-        user.setId(UUID.randomUUID()); // Set ID before saving
+        // Manual ID assignment required because the migration doesn't have UUID auto-generation (DEFAULT random_uuid())
+        // Spring Data JDBC requires the ID to be set before save for new entities without @GeneratedValue
+        user.setId(UUID.randomUUID());
         user.setUsername(username);
         user.setName("Test User");
         user.setEmailAddress(email);
