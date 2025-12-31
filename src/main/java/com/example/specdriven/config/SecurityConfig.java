@@ -1,11 +1,14 @@
 package com.example.specdriven.config;
 
+import com.example.specdriven.security.BootstrapModeFilter;
+import com.example.specdriven.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Spring Security configuration for the application.
@@ -14,12 +17,22 @@ import org.springframework.security.web.SecurityFilterChain;
  * Security Rules:
  * - /ping: Always accessible (no authentication required)
  * - /login: Accessible without authentication
+ * - POST /users: Accessible without authentication in bootstrap mode (no users exist)
  * - /users/**: Requires authentication (JWT bearer token)
  * - All other endpoints: Require authentication by default
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final BootstrapModeFilter bootstrapModeFilter;
+    
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                         BootstrapModeFilter bootstrapModeFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.bootstrapModeFilter = bootstrapModeFilter;
+    }
 
     /**
      * Configure the security filter chain.
@@ -64,7 +77,13 @@ public class SecurityConfig {
             // Allow H2 console frames (for development only)
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin())
-            );
+            )
+            
+            // Add bootstrap mode filter first (allows first user creation without auth)
+            .addFilterBefore(bootstrapModeFilter, UsernamePasswordAuthenticationFilter.class)
+            
+            // Add JWT authentication filter before UsernamePasswordAuthenticationFilter
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

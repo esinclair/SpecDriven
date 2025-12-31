@@ -7,7 +7,7 @@ feature-flag:
 
 # JWT Configuration (test values)
 jwt:
-  secret: test-secret-for-integration-tests-not-for-production
+  secret: test-jwt-secret-key-for-integration-tests-minimum-256-bits-required-not-for-production-use
   expirationMs: 86400000  # 24 hours
 
 # Spring Boot Test Configuration

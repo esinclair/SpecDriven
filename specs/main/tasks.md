@@ -159,13 +159,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T058 [P] [US2] Create JwtTokenProvider.java in src/main/java/com/example/specdriven/security/JwtTokenProvider.java with @Component, methods generateToken(userId), validateToken(token), getUserIdFromToken(token) using jjwt library
-- [ ] T059 [US2] Create JwtAuthenticationFilter.java in src/main/java/com/example/specdriven/security/JwtAuthenticationFilter.java extending OncePerRequestFilter to extract Bearer token, validate with JwtTokenProvider, set Spring Security authentication context
-- [ ] T060 [US2] Update SecurityConfig.java to add JwtAuthenticationFilter to filter chain before UsernamePasswordAuthenticationFilter
-- [ ] T061 [US2] Create LoginService.java in src/main/java/com/example/specdriven/service/LoginService.java with @Service @Transactional methods: login(LoginRequest) → LoginResponse validating credentials with BCrypt and returning JWT token
-- [ ] T062 [US2] Implement non-enumeration in LoginService.java: always hash password even if user not found, return same error for unknown username and wrong password
-- [ ] T063 [US2] Create LoginController.java in src/main/java/com/example/specdriven/controller/LoginController.java implementing generated LoginApi interface, delegating to LoginService
-- [ ] T064 [US2] Update SecurityConfig.java to permit /login endpoint without authentication
+- [X] T058 [P] [US2] Create JwtTokenProvider.java in src/main/java/com/example/specdriven/security/JwtTokenProvider.java with @Component, methods generateToken(userId), validateToken(token), getUserIdFromToken(token) using jjwt library
+- [X] T059 [US2] Create JwtAuthenticationFilter.java in src/main/java/com/example/specdriven/security/JwtAuthenticationFilter.java extending OncePerRequestFilter to extract Bearer token, validate with JwtTokenProvider, set Spring Security authentication context
+- [X] T060 [US2] Update SecurityConfig.java to add JwtAuthenticationFilter to filter chain before UsernamePasswordAuthenticationFilter
+- [X] T061 [US2] Create LoginService.java in src/main/java/com/example/specdriven/service/LoginService.java with @Service @Transactional methods: login(LoginRequest) → LoginResponse validating credentials with BCrypt and returning JWT token
+- [X] T062 [US2] Implement non-enumeration in LoginService.java: always hash password even if user not found, return same error for unknown username and wrong password
+- [X] T063 [US2] Create LoginController.java in src/main/java/com/example/specdriven/controller/LoginController.java implementing generated LoginApi interface, delegating to LoginService
+- [X] T064 [US2] Update SecurityConfig.java to permit /login endpoint without authentication
 
 **Checkpoint**: Authentication is fully functional - users can login and use tokens for protected endpoints
 
@@ -197,15 +197,15 @@
 
 ### Implementation for User Story 3
 
-- [ ] T080 [P] [US3] Create UserMapper.java in src/main/java/com/example/specdriven/mapper/UserMapper.java with @Component methods: toEntity(CreateUserRequest), toDto(UserEntity, List<RoleEntity>), toEntity(UpdateUserRequest, UserEntity) - hash passwords with BCryptPasswordEncoder, never map password to DTO
-- [ ] T081 [US3] Create UserService.java in src/main/java/com/example/specdriven/service/UserService.java with @Service @Transactional methods: createUser(CreateUserRequest) → User, getUserById(UUID) → User, validateEmailUniqueness, checkBootstrapMode
-- [ ] T082 [US3] Implement bootstrap mode logic in UserService.java: allow user creation without auth if countUsers() == 0
-- [ ] T083 [US3] Implement email uniqueness validation in UserService.java: check UserRepository.findByEmail before create, throw ConflictException if exists
-- [ ] T084 [US3] Implement password hashing in UserMapper.java: call passwordEncoder.encode() when mapping CreateUserRequest to UserEntity
-- [ ] T085 [US3] Create UsersController.java in src/main/java/com/example/specdriven/controller/UsersController.java implementing generated UsersApi interface with createUser() and getUserById() methods delegating to UserService
-- [ ] T086 [US3] Update SecurityConfig.java to allow POST /users without authentication in bootstrap mode (use custom filter or permit matcher)
-- [ ] T087 [US3] Ensure UsersController validates inputs using @Valid annotation on request parameters
-- [ ] T088 [US3] Load user's roles in UserService.getUserById() by querying UserRoleRepository and RoleRepository, pass to UserMapper.toDto()
+- [X] T080 [P] [US3] Create UserMapper.java in src/main/java/com/example/specdriven/mapper/UserMapper.java with @Component methods: toEntity(CreateUserRequest), toDto(UserEntity, List<RoleEntity>), toEntity(UpdateUserRequest, UserEntity) - hash passwords with BCryptPasswordEncoder, never map password to DTO
+- [X] T081 [US3] Create UserService.java in src/main/java/com/example/specdriven/service/UserService.java with @Service @Transactional methods: createUser(CreateUserRequest) → User, getUserById(UUID) → User, validateEmailUniqueness, checkBootstrapMode
+- [X] T082 [US3] Implement bootstrap mode logic in UserService.java: allow user creation without auth if countUsers() == 0
+- [X] T083 [US3] Implement email uniqueness validation in UserService.java: check UserRepository.findByEmail before create, throw ConflictException if exists
+- [X] T084 [US3] Implement password hashing in UserMapper.java: call passwordEncoder.encode() when mapping CreateUserRequest to UserEntity
+- [X] T085 [US3] Create UsersController.java in src/main/java/com/example/specdriven/controller/UsersController.java implementing generated UsersApi interface with createUser() and getUserById() methods delegating to UserService
+- [X] T086 [US3] Update SecurityConfig.java to allow POST /users without authentication in bootstrap mode (use custom filter or permit matcher)
+- [X] T087 [US3] Ensure UsersController validates inputs using @Valid annotation on request parameters
+- [X] T088 [US3] Load user's roles in UserService.getUserById() by querying UserRoleRepository and RoleRepository, pass to UserMapper.toDto()
 
 **Checkpoint**: Users can be created (bootstrap mode working) and retrieved with full role information, passwords are hashed and never returned
 
@@ -234,12 +234,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T101 [US4] Add updateUser(UUID, UpdateUserRequest) method to UserService.java: fetch existing user, validate uniqueness if email changed, apply updates via UserMapper, save updated entity, return User DTO
-- [ ] T102 [US4] Add deleteUser(UUID) method to UserService.java: check user exists, delete from UserRepository (cascade deletes user_roles automatically via DB FK constraint)
-- [ ] T103 [US4] Update UserMapper.java with updateEntity(UpdateUserRequest, UserEntity) method for partial updates: only update non-null fields, hash password if provided
-- [ ] T104 [US4] Implement updateUser() and deleteUser() methods in UsersController.java delegating to UserService with @Valid validation
-- [ ] T105 [US4] Update updated_at timestamp in UserEntity when updating via UserService (set to current timestamp)
-- [ ] T106 [US4] Verify Flyway migration includes ON DELETE CASCADE for user_roles.user_id foreign key to ensure role assignments are deleted
+- [X] T101 [US4] Add updateUser(UUID, UpdateUserRequest) method to UserService.java: fetch existing user, validate uniqueness if email changed, apply updates via UserMapper, save updated entity, return User DTO
+- [X] T102 [US4] Add deleteUser(UUID) method to UserService.java: check user exists, delete from UserRepository (cascade deletes user_roles automatically via DB FK constraint)
+- [X] T103 [US4] Update UserMapper.java with updateEntity(UpdateUserRequest, UserEntity) method for partial updates: only update non-null fields, hash password if provided
+- [X] T104 [US4] Implement updateUser() and deleteUser() methods in UsersController.java delegating to UserService with @Valid validation
+- [X] T105 [US4] Update updated_at timestamp in UserEntity when updating via UserService (set to current timestamp)
+- [X] T106 [US4] Verify Flyway migration includes ON DELETE CASCADE for user_roles.user_id foreign key to ensure role assignments are deleted
 
 **Checkpoint**: Users can be updated with partial data and deleted; role assignments cascade delete; all validations work
 

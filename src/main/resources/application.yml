@@ -6,7 +6,7 @@ feature-flag:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:default-secret-change-in-production-this-is-not-secure}
+  secret: ${JWT_SECRET:default-jwt-secret-key-for-development-only-change-in-production-minimum-256-bits}
   expirationMs: 86400000  # 24 hours in milliseconds
 
 # Spring Boot Configuration
