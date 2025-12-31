@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @SpringBootTest
 @TestPropertySource(properties = {
-    "jwt.secret=test-secret-key-for-testing",
+    "jwt.secret=test-secret-key-for-testing-must-be-long-enough-for-hs256",
     "jwt.expirationMs=3600000"
 })
 class JwtConfigTest {
@@ -29,7 +29,7 @@ class JwtConfigTest {
     @Test
     void jwtSecret_IsLoaded() {
         assertNotNull(jwtConfig.getSecret());
-        assertEquals("test-secret-key-for-testing", jwtConfig.getSecret());
+        assertEquals("test-secret-key-for-testing-must-be-long-enough-for-hs256", jwtConfig.getSecret());
     }
 
     @Test
