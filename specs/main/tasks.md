@@ -249,30 +249,30 @@
 
 ### Tests for User Story 5 (MANDATORY)
 
-- [ ] T107 [P] [US5] Create UserListIntegrationTest.java in src/test/java/com/example/specdriven/integration/UserListIntegrationTest.java with @SpringBootTest
-- [ ] T108 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_ValidPagination_Returns200WithPage testing GET /users with page and pageSize returns UserPage with items and metadata
-- [ ] T109 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MultiplePages_ReturnsCorrectPage testing pagination returns correct page of results with correct totalCount and totalPages
-- [ ] T110 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_LastPage_ReturnsRemainingItems testing last page contains remaining items (less than pageSize)
-- [ ] T111 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_EmptyResults_ReturnsEmptyPageWith200 testing query with no matches returns 200 with empty items array and valid metadata
-- [ ] T112 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_FilterByUsername_ReturnsMatchingUsers testing username filter returns only matching users
-- [ ] T113 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_FilterByEmail_ReturnsMatchingUsers testing emailAddress filter returns exact match
-- [ ] T114 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_FilterByName_ReturnsCaseInsensitivePartialMatch testing name filter works case-insensitively
-- [ ] T115 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_FilterByRoleName_ReturnsUsersWithRole testing roleName filter returns users with that role assigned
-- [ ] T116 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MultipleFilters_ReturnsUsersMatchingAll testing AND logic when multiple filters provided
-- [ ] T117 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MissingPagination_Returns400 testing missing page or pageSize parameters returns 400 VALIDATION_FAILED
-- [ ] T118 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_InvalidPagination_Returns400 testing invalid page/pageSize (negative, zero, >100) returns 400 VALIDATION_FAILED
+- [X] T107 [P] [US5] Create UserListIntegrationTest.java in src/test/java/com/example/specdriven/integration/UserListIntegrationTest.java with @SpringBootTest
+- [X] T108 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_ValidPagination_Returns200WithPage testing GET /users with page and pageSize returns UserPage with items and metadata
+- [X] T109 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MultiplePages_ReturnsCorrectPage testing pagination returns correct page of results with correct totalCount and totalPages
+- [X] T110 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_LastPage_ReturnsRemainingItems testing last page contains remaining items (less than pageSize)
+- [X] T111 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_EmptyResults_ReturnsEmptyPageWith200 testing query with no matches returns 200 with empty items array and valid metadata
+- [X] T112 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_FilterByUsername_ReturnsMatchingUsers testing username filter returns only matching users
+- [X] T113 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_FilterByEmail_ReturnsMatchingUsers testing emailAddress filter returns exact match
+- [X] T114 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_FilterByName_ReturnsCaseInsensitivePartialMatch testing name filter works case-insensitively
+- [X] T115 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_FilterByRoleName_ReturnsUsersWithRole testing roleName filter returns users with that role assigned
+- [X] T116 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MultipleFilters_ReturnsUsersMatchingAll testing AND logic when multiple filters provided
+- [X] T117 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MissingPagination_Returns400 testing missing page or pageSize parameters returns 400 VALIDATION_FAILED
+- [X] T118 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_InvalidPagination_Returns400 testing invalid page/pageSize (negative, zero, >100) returns 400 VALIDATION_FAILED
 - [ ] T119 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_UnsupportedQueryParam_Returns400 testing unknown query parameters return 400 VALIDATION_FAILED
-- [ ] T120 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_NoAuth_Returns401 testing list without auth returns 401
-- [ ] T121 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MaxPageSize_EnforcesLimit testing pageSize > 100 is rejected
+- [X] T120 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_NoAuth_Returns401 testing list without auth returns 401
+- [X] T121 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MaxPageSize_EnforcesLimit testing pageSize > 100 is rejected
 
 ### Implementation for User Story 5
 
-- [ ] T122 [US5] Use Spring Data's PagingAndSortingRepository to add findAll(Pageable pageable) → Page<UserEntity> method (built-in paging support)
-- [ ] T123 [US5] Add derived query methods to UserRepository.java for filtering: findByUsername, findByEmailAddress, findByNameContainingIgnoreCase (Spring generates queries from method names), and use Pageable parameter for pagination
-- [ ] T124 [US5] Add listUsers(page, pageSize, filters) method to UserService.java: validate pagination params, create Pageable object using PageRequest.of(page-1, pageSize), call repository.findAll(Pageable) or filtered methods with Pageable parameter, map Page<UserEntity> to UserPage DTO with totalCount, totalPages from Page object
-- [ ] T125 [US5] Implement filter logic in UserService.java: use appropriate Spring Data derived query methods based on provided filters (call findByUsername, findByEmailAddress, findByNameContainingIgnoreCase with Pageable parameter; for role filtering, coordinate with UserRoleRepository)
-- [ ] T126 [US5] Implement listUsers() method in UsersController.java: validate pagination parameters with @Valid, delegate to UserService, return UserPage response
-- [ ] T127 [US5] Add validation in UsersController or service to enforce pageSize maximum of 100 and minimum of 1, page minimum of 1
+- [X] T122 [US5] Use Spring Data's PagingAndSortingRepository to add findAll(Pageable pageable) → Page<UserEntity> method (built-in paging support)
+- [X] T123 [US5] Add derived query methods to UserRepository.java for filtering: findByUsername, findByEmailAddress, findByNameContainingIgnoreCase (Spring generates queries from method names), and use Pageable parameter for pagination
+- [X] T124 [US5] Add listUsers(page, pageSize, filters) method to UserService.java: validate pagination params, create Pageable object using PageRequest.of(page-1, pageSize), call repository.findAll(Pageable) or filtered methods with Pageable parameter, map Page<UserEntity> to UserPage DTO with totalCount, totalPages from Page object
+- [X] T125 [US5] Implement filter logic in UserService.java: use appropriate Spring Data derived query methods based on provided filters (call findByUsername, findByEmailAddress, findByNameContainingIgnoreCase with Pageable parameter; for role filtering, coordinate with UserRoleRepository)
+- [X] T126 [US5] Implement listUsers() method in UsersController.java: validate pagination parameters with @Valid, delegate to UserService, return UserPage response
+- [X] T127 [US5] Add validation in UsersController or service to enforce pageSize maximum of 100 and minimum of 1, page minimum of 1
 - [ ] T128 [US5] Add validation to reject unsupported query parameters not defined in OpenAPI contract
 
 **Checkpoint**: List users endpoint works with pagination and all filters; validation enforces required params and limits
@@ -287,27 +287,27 @@
 
 ### Tests for User Story 6 (MANDATORY)
 
-- [ ] T129 [P] [US6] Create RoleManagementIntegrationTest.java in src/test/java/com/example/specdriven/integration/RoleManagementIntegrationTest.java with @SpringBootTest
-- [ ] T130 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_ValidRole_Returns204 testing PUT /users/{id}/roles/{roleName} returns 204
-- [ ] T131 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_VerifyAssigned_RoleAppearsInUser testing assigned role appears in GET /users/{id} response
-- [ ] T132 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_AlreadyAssigned_IdempotentReturns204 testing assigning same role twice returns 204 both times (idempotent)
-- [ ] T133 [P] [US6] Add test in RoleManagementIntegrationTest.java: removeRole_ValidRole_Returns204 testing DELETE /users/{id}/roles/{roleName} returns 204
-- [ ] T134 [P] [US6] Add test in RoleManagementIntegrationTest.java: removeRole_VerifyRemoved_RoleNotInUser testing removed role no longer appears in GET /users/{id} response
-- [ ] T135 [P] [US6] Add test in RoleManagementIntegrationTest.java: removeRole_NotAssigned_IdempotentReturns204 testing removing unassigned role returns 204 (idempotent)
-- [ ] T136 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_UserNotFound_Returns404 testing assign role to non-existent user returns 404 RESOURCE_NOT_FOUND
-- [ ] T137 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_InvalidRoleName_Returns400 testing invalid role name returns 400 VALIDATION_FAILED
-- [ ] T138 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_NoAuth_Returns401 testing assign without auth returns 401
-- [ ] T139 [P] [US6] Add test in RoleManagementIntegrationTest.java: removeRole_NoAuth_Returns401 testing remove without auth returns 401
-- [ ] T140 [P] [US6] Create RoleServiceTest.java in src/test/java/com/example/specdriven/service/RoleServiceTest.java with unit tests for role assignment logic
+- [X] T129 [P] [US6] Create RoleManagementIntegrationTest.java in src/test/java/com/example/specdriven/integration/RoleManagementIntegrationTest.java with @SpringBootTest
+- [X] T130 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_ValidRole_Returns204 testing PUT /users/{id}/roles/{roleName} returns 204
+- [X] T131 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_VerifyAssigned_RoleAppearsInUser testing assigned role appears in GET /users/{id} response
+- [X] T132 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_AlreadyAssigned_IdempotentReturns204 testing assigning same role twice returns 204 both times (idempotent)
+- [X] T133 [P] [US6] Add test in RoleManagementIntegrationTest.java: removeRole_ValidRole_Returns204 testing DELETE /users/{id}/roles/{roleName} returns 204
+- [X] T134 [P] [US6] Add test in RoleManagementIntegrationTest.java: removeRole_VerifyRemoved_RoleNotInUser testing removed role no longer appears in GET /users/{id} response
+- [X] T135 [P] [US6] Add test in RoleManagementIntegrationTest.java: removeRole_NotAssigned_IdempotentReturns204 testing removing unassigned role returns 204 (idempotent)
+- [X] T136 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_UserNotFound_Returns404 testing assign role to non-existent user returns 404 RESOURCE_NOT_FOUND
+- [X] T137 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_InvalidRoleName_Returns400 testing invalid role name returns 400 VALIDATION_FAILED
+- [X] T138 [P] [US6] Add test in RoleManagementIntegrationTest.java: assignRole_NoAuth_Returns401 testing assign without auth returns 401
+- [X] T139 [P] [US6] Add test in RoleManagementIntegrationTest.java: removeRole_NoAuth_Returns401 testing remove without auth returns 401
+- [X] T140 [P] [US6] Create RoleServiceTest.java in src/test/java/com/example/specdriven/service/RoleServiceTest.java with unit tests for role assignment logic
 
 ### Implementation for User Story 6
 
-- [ ] T141 [P] [US6] Create RoleMapper.java in src/main/java/com/example/specdriven/mapper/RoleMapper.java with @Component methods: toDto(RoleEntity, List<PermissionEntity>) → Role
-- [ ] T142 [US6] Create RoleService.java in src/main/java/com/example/specdriven/service/RoleService.java with @Service @Transactional methods: assignRole(UUID userId, String roleName), removeRole(UUID userId, String roleName)
-- [ ] T143 [US6] Implement assignRole in RoleService.java: validate user exists (throw ResourceNotFoundException), validate role exists by roleName (throw ValidationException), check if already assigned, if not create UserRoleEntity and save (idempotent)
-- [ ] T144 [US6] Implement removeRole in RoleService.java: validate user exists, find role by name, delete UserRoleEntity if exists, return success regardless (idempotent)
-- [ ] T145 [US6] Create UserRolesController.java in src/main/java/com/example/specdriven/controller/UserRolesController.java implementing generated UsersApi role endpoints: assignRoleToUser() and removeRoleFromUser() delegating to RoleService
-- [ ] T146 [US6] Add validation in RoleService to ensure roleName matches one of the predefined RoleNameEnum values (ADMIN, USER, GUEST)
+- [X] T141 [P] [US6] Create RoleMapper.java in src/main/java/com/example/specdriven/mapper/RoleMapper.java with @Component methods: toDto(RoleEntity, List<PermissionEntity>) → Role
+- [X] T142 [US6] Create RoleService.java in src/main/java/com/example/specdriven/service/RoleService.java with @Service @Transactional methods: assignRole(UUID userId, String roleName), removeRole(UUID userId, String roleName)
+- [X] T143 [US6] Implement assignRole in RoleService.java: validate user exists (throw ResourceNotFoundException), validate role exists by roleName (throw ValidationException), check if already assigned, if not create UserRoleEntity and save (idempotent)
+- [X] T144 [US6] Implement removeRole in RoleService.java: validate user exists, find role by name, delete UserRoleEntity if exists, return success regardless (idempotent)
+- [X] T145 [US6] Create UserRolesController.java in src/main/java/com/example/specdriven/controller/UserRolesController.java implementing generated UsersApi role endpoints: assignRoleToUser() and removeRoleFromUser() delegating to RoleService
+- [X] T146 [US6] Add validation in RoleService to ensure roleName matches one of the predefined RoleNameEnum values (ADMIN, USER, GUEST)
 
 **Checkpoint**: Role assignment and removal work with proper idempotency; validation prevents invalid roles; all tests pass
 
@@ -321,21 +321,21 @@
 
 ### Tests for User Story 9 (MANDATORY)
 
-- [ ] T147 [P] [US9] Create FeatureFlagIntegrationTest.java in src/test/java/com/example/specdriven/integration/FeatureFlagIntegrationTest.java with @SpringBootTest
-- [ ] T148 [P] [US9] Add test in FeatureFlagIntegrationTest.java: usersApi_FeatureFlagDisabled_Returns404 testing all user endpoints (/users, /users/{id}, /login) return 404 when FeatureFlag.usersApi=false
-- [ ] T149 [P] [US9] Add test in FeatureFlagIntegrationTest.java: usersApi_FeatureFlagEnabled_ProcessesRequests testing user endpoints work normally when FeatureFlag.usersApi=true
-- [ ] T150 [P] [US9] Add test in FeatureFlagIntegrationTest.java: ping_FeatureFlagDisabled_StillWorks verifying /ping works regardless of feature flag state
-- [ ] T151 [P] [US9] Add test in FeatureFlagIntegrationTest.java: featureFlagDisabled_ErrorDoesNotRevealFeature verifying 404 error message doesn't reveal feature exists or is disabled
-- [ ] T152 [P] [US9] Create FeatureFlagSecurityFilterTest.java in src/test/java/com/example/specdriven/security/FeatureFlagSecurityFilterTest.java with unit tests for filter logic
+- [X] T147 [P] [US9] Create FeatureFlagIntegrationTest.java in src/test/java/com/example/specdriven/integration/FeatureFlagIntegrationTest.java with @SpringBootTest
+- [X] T148 [P] [US9] Add test in FeatureFlagIntegrationTest.java: usersApi_FeatureFlagDisabled_Returns404 testing all user endpoints (/users, /users/{id}, /login) return 404 when FeatureFlag.usersApi=false
+- [X] T149 [P] [US9] Add test in FeatureFlagIntegrationTest.java: usersApi_FeatureFlagEnabled_ProcessesRequests testing user endpoints work normally when FeatureFlag.usersApi=true
+- [X] T150 [P] [US9] Add test in FeatureFlagIntegrationTest.java: ping_FeatureFlagDisabled_StillWorks verifying /ping works regardless of feature flag state
+- [X] T151 [P] [US9] Add test in FeatureFlagIntegrationTest.java: featureFlagDisabled_ErrorDoesNotRevealFeature verifying 404 error message doesn't reveal feature exists or is disabled
+- [X] T152 [P] [US9] Create FeatureFlagSecurityFilterTest.java in src/test/java/com/example/specdriven/security/FeatureFlagSecurityFilterTest.java with unit tests for filter logic
 
 ### Implementation for User Story 9
 
-- [ ] T153 [US9] Create FeatureFlagSecurityFilter.java in src/main/java/com/example/specdriven/security/FeatureFlagSecurityFilter.java extending OncePerRequestFilter to check if request path requires feature flag, if FeatureFlag.usersApi is false and path is /users/** or /login, return 404 with RESOURCE_NOT_FOUND (no feature disclosure)
-- [ ] T154 [US9] Update SecurityConfig.java to add FeatureFlagSecurityFilter to filter chain before JwtAuthenticationFilter
-- [ ] T155 [US9] Configure FeatureFlagSecurityFilter to explicitly bypass /ping endpoint (always allow)
-- [ ] T156 [US9] Verify application.yml has FeatureFlag.usersApi set to false as default
-- [ ] T157 [US9] Add documentation comment in FeatureFlagConfig.java explaining default value is false until feature validated
-- [ ] T158 [US9] Update application-test.yml to set FeatureFlag.usersApi=true for most tests (except feature flag specific tests)
+- [X] T153 [US9] Create FeatureFlagSecurityFilter.java in src/main/java/com/example/specdriven/security/FeatureFlagSecurityFilter.java extending OncePerRequestFilter to check if request path requires feature flag, if FeatureFlag.usersApi is false and path is /users/** or /login, return 404 with RESOURCE_NOT_FOUND (no feature disclosure)
+- [X] T154 [US9] Update SecurityConfig.java to add FeatureFlagSecurityFilter to filter chain before JwtAuthenticationFilter
+- [X] T155 [US9] Configure FeatureFlagSecurityFilter to explicitly bypass /ping endpoint (always allow)
+- [X] T156 [US9] Verify application.yml has FeatureFlag.usersApi set to false as default
+- [X] T157 [US9] Add documentation comment in FeatureFlagConfig.java explaining default value is false until feature validated
+- [X] T158 [US9] Update application-test.yml to set FeatureFlag.usersApi=true for most tests (except feature flag specific tests)
 
 **Checkpoint**: Feature flag gates all user API endpoints; /ping bypasses flag; tests verify both modes
 

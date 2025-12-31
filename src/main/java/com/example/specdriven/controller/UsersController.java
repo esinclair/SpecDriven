@@ -2,6 +2,7 @@ package com.example.specdriven.controller;
 
 import com.example.specdriven.api.UsersApi;
 import com.example.specdriven.api.model.*;
+import com.example.specdriven.service.RoleService;
 import com.example.specdriven.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,15 +12,17 @@ import java.util.UUID;
 
 /**
  * Controller implementing the Users API for user management operations.
- * Delegates to UserService for business logic.
+ * Delegates to UserService and RoleService for business logic.
  */
 @RestController
 public class UsersController implements UsersApi {
 
     private final UserService userService;
+    private final RoleService roleService;
 
-    public UsersController(UserService userService) {
+    public UsersController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     /**
@@ -73,7 +76,6 @@ public class UsersController implements UsersApi {
 
     /**
      * List users with pagination and optional filters.
-     * This will be fully implemented in Phase 8.
      *
      * @param page 1-based page number
      * @param pageSize number of items per page
@@ -86,19 +88,12 @@ public class UsersController implements UsersApi {
     @Override
     public ResponseEntity<UserPage> listUsers(Integer page, Integer pageSize, String username,
                                               String emailAddress, String name, RoleName roleName) {
-        // Placeholder implementation - will be completed in Phase 8
-        UserPage userPage = new UserPage();
-        userPage.setItems(java.util.Collections.emptyList());
-        userPage.setPage(page);
-        userPage.setPageSize(pageSize);
-        userPage.setTotalItems(0);
-        userPage.setTotalPages(0);
+        UserPage userPage = userService.listUsers(page, pageSize, username, emailAddress, name, roleName);
         return ResponseEntity.ok(userPage);
     }
 
     /**
      * Assign a role to a user (idempotent).
-     * This will be fully implemented in Phase 9.
      *
      * @param userId the user ID
      * @param roleName the role to assign
@@ -106,13 +101,12 @@ public class UsersController implements UsersApi {
      */
     @Override
     public ResponseEntity<Void> assignRoleToUser(UUID userId, RoleName roleName) {
-        // Placeholder - will be implemented in Phase 9
+        roleService.assignRole(userId, roleName);
         return ResponseEntity.noContent().build();
     }
 
     /**
      * Remove a role from a user (idempotent).
-     * This will be fully implemented in Phase 9.
      *
      * @param userId the user ID
      * @param roleName the role to remove
@@ -120,7 +114,7 @@ public class UsersController implements UsersApi {
      */
     @Override
     public ResponseEntity<Void> removeRoleFromUser(UUID userId, RoleName roleName) {
-        // Placeholder - will be implemented in Phase 9
+        roleService.removeRole(userId, roleName);
         return ResponseEntity.noContent().build();
     }
 }

@@ -6,12 +6,16 @@ import com.example.specdriven.domain.UserEntity;
 import com.example.specdriven.domain.UserRoleEntity;
 import com.example.specdriven.exception.ConflictException;
 import com.example.specdriven.exception.ResourceNotFoundException;
+import com.example.specdriven.exception.ValidationException;
 import com.example.specdriven.mapper.UserMapper;
 import com.example.specdriven.repository.RoleRepository;
 import com.example.specdriven.repository.UserRepository;
 import com.example.specdriven.repository.UserRoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private static final int MAX_PAGE_SIZE = 100;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -168,5 +173,179 @@ public class UserService {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * List users with pagination and optional filters.
+     *
+     * @param page 1-based page number
+     * @param pageSize number of items per page
+     * @param username optional exact username filter
+     * @param emailAddress optional exact email filter
+     * @param name optional case-insensitive partial name filter
+     * @param roleName optional role filter
+     * @return UserPage with matching users and pagination metadata
+     * @throws ValidationException if pagination parameters are invalid
+     */
+    @Transactional(readOnly = true)
+    public UserPage listUsers(Integer page, Integer pageSize, String username, 
+                              String emailAddress, String name, RoleName roleName) {
+        // Validate pagination parameters
+        validatePaginationParams(page, pageSize);
+
+        // Create pageable (Spring Data uses 0-based page index)
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+
+        Page<UserEntity> userPage;
+
+        // Handle role filtering separately (requires joining user_roles table)
+        if (roleName != null) {
+            userPage = listUsersByRole(roleName.getValue(), username, emailAddress, name, pageable);
+        } else {
+            userPage = listUsersByFilters(username, emailAddress, name, pageable);
+        }
+
+        // Map to UserPage DTO
+        return toUserPage(userPage, page, pageSize);
+    }
+
+    /**
+     * Validate pagination parameters.
+     */
+    private void validatePaginationParams(Integer page, Integer pageSize) {
+        if (page == null || page < 1) {
+            throw new ValidationException("Page must be >= 1");
+        }
+        if (pageSize == null || pageSize < 1) {
+            throw new ValidationException("Page size must be >= 1");
+        }
+        if (pageSize > MAX_PAGE_SIZE) {
+            throw new ValidationException("Page size must be <= " + MAX_PAGE_SIZE);
+        }
+    }
+
+    /**
+     * List users by filters (without role filter).
+     */
+    private Page<UserEntity> listUsersByFilters(String username, String emailAddress, 
+                                                 String name, Pageable pageable) {
+        // Determine which query to use based on filters provided
+        boolean hasUsername = username != null && !username.isEmpty();
+        boolean hasEmail = emailAddress != null && !emailAddress.isEmpty();
+        boolean hasName = name != null && !name.isEmpty();
+
+        if (hasUsername && hasEmail && hasName) {
+            return userRepository.findByUsernameAndEmailAddressAndNameContainingIgnoreCase(
+                    username, emailAddress, name, pageable);
+        } else if (hasUsername && hasEmail) {
+            return userRepository.findByUsernameAndEmailAddress(username, emailAddress, pageable);
+        } else if (hasUsername && hasName) {
+            return userRepository.findByUsernameAndNameContainingIgnoreCase(username, name, pageable);
+        } else if (hasEmail && hasName) {
+            return userRepository.findByEmailAddressAndNameContainingIgnoreCase(emailAddress, name, pageable);
+        } else if (hasUsername) {
+            return userRepository.findByUsername(username, pageable);
+        } else if (hasEmail) {
+            return userRepository.findByEmailAddress(emailAddress, pageable);
+        } else if (hasName) {
+            return userRepository.findByNameContainingIgnoreCase(name, pageable);
+        } else {
+            return userRepository.findAll(pageable);
+        }
+    }
+
+    /**
+     * List users by role (with optional additional filters).
+     */
+    private Page<UserEntity> listUsersByRole(String roleName, String username,
+                                              String emailAddress, String name, Pageable pageable) {
+        // First, find the role
+        RoleEntity role = roleRepository.findByRoleName(roleName)
+                .orElse(null);
+        
+        if (role == null) {
+            // Role doesn't exist, return empty page
+            return Page.empty(pageable);
+        }
+
+        // Get user IDs with this role
+        List<UserRoleEntity> userRoles = userRoleRepository.findByRoleId(role.getId());
+        List<UUID> userIds = userRoles.stream()
+                .map(UserRoleEntity::getUserId)
+                .collect(Collectors.toList());
+
+        if (userIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // Get users by IDs with pagination
+        Page<UserEntity> usersWithRole = userRepository.findByIdIn(userIds, pageable);
+
+        // Apply additional filters in memory if necessary
+        if (username != null || emailAddress != null || name != null) {
+            List<UserEntity> filtered = usersWithRole.getContent().stream()
+                    .filter(user -> matchesFilters(user, username, emailAddress, name))
+                    .collect(Collectors.toList());
+            
+            // Calculate proper pagination offset
+            int start = (int) pageable.getOffset();
+            int end = Math.min(filtered.size(), start + pageable.getPageSize());
+            
+            // Handle case where start exceeds filtered size
+            List<UserEntity> pageContent;
+            if (start >= filtered.size()) {
+                pageContent = java.util.Collections.emptyList();
+            } else {
+                pageContent = filtered.subList(start, end);
+            }
+            
+            return new org.springframework.data.domain.PageImpl<>(
+                    pageContent, pageable, filtered.size());
+        }
+
+        return usersWithRole;
+    }
+
+    private int pageSize(Pageable pageable) {
+        return pageable.getPageSize();
+    }
+
+    /**
+     * Check if a user matches the given filters.
+     */
+    private boolean matchesFilters(UserEntity user, String username, 
+                                   String emailAddress, String name) {
+        if (username != null && !username.equals(user.getUsername())) {
+            return false;
+        }
+        if (emailAddress != null && !emailAddress.equals(user.getEmailAddress())) {
+            return false;
+        }
+        if (name != null && (user.getName() == null || 
+                !user.getName().toLowerCase().contains(name.toLowerCase()))) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Convert Page<UserEntity> to UserPage DTO.
+     */
+    private UserPage toUserPage(Page<UserEntity> page, Integer pageNum, Integer pageSize) {
+        List<User> users = page.getContent().stream()
+                .map(entity -> {
+                    List<Role> roles = loadUserRoles(entity.getId());
+                    return userMapper.toDto(entity, roles);
+                })
+                .collect(Collectors.toList());
+
+        UserPage userPage = new UserPage();
+        userPage.setItems(users);
+        userPage.setPage(pageNum);
+        userPage.setPageSize(pageSize);
+        userPage.setTotalItems((int) page.getTotalElements());
+        userPage.setTotalPages(page.getTotalPages());
+
+        return userPage;
     }
 }
