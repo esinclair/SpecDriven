@@ -1,8 +1,6 @@
 package com.example.specdriven.domain;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
@@ -11,17 +9,18 @@ import java.util.UUID;
  * Maps to the 'roles' table in the database.
  * Roles are predefined (ADMIN, USER, GUEST).
  */
-@Table("roles")
+@Entity
+@Table(name = "roles")
 public class RoleEntity {
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
-    @Column("role_name")
+    @Column(name = "role_name")
     private String roleName;
 
-    @Column("description")
+    @Column(name = "description")
     private String description;
 
     // Constructors

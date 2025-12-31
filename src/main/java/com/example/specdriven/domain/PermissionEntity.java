@@ -1,8 +1,6 @@
 package com.example.specdriven.domain;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
@@ -11,17 +9,18 @@ import java.util.UUID;
  * Maps to the 'permissions' table in the database.
  * Permissions are predefined (users:read, users:write, users:delete, roles:assign).
  */
-@Table("permissions")
+@Entity
+@Table(name = "permissions")
 public class PermissionEntity {
 
     @Id
-    @Column("id")
+    @Column(name = "id")
     private UUID id;
 
-    @Column("permission")
+    @Column(name = "permission")
     private String permission;
 
-    @Column("description")
+    @Column(name = "description")
     private String description;
 
     // Constructors

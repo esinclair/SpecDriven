@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * Integration tests for UserRepository.
  * Tests repository methods with an actual in-memory H2 database.
  * 
- * Note: Tests are isolated using @DirtiesContext to ensure clean state between tests.
+ * Note: Uses JpaRepository with flush() to ensure data visibility in tests.
+ * Each test is transactional and rolls back after completion for isolation.
  */
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 class UserRepositoryTest {
 
     @Autowired
@@ -32,6 +33,7 @@ class UserRepositoryTest {
         UserEntity user = createTestUser("testuser", "test@example.com");
         
         UserEntity saved = userRepository.save(user);
+        userRepository.flush();
         
         assertNotNull(saved);
         assertNotNull(saved.getId());
@@ -39,15 +41,11 @@ class UserRepositoryTest {
         assertEquals("test@example.com", saved.getEmailAddress());
     }
 
-    // FIXME: These tests have transaction isolation issues with Spring Data JDBC
-    // Data saved in the test is not visible in subsequent find operations
-    // Needs investigation of Spring Data JDBC configuration or test setup
-    
     @Test
-    @org.junit.jupiter.api.Disabled("Transaction isolation issue - data not visible after save")
     void findById_ReturnsUser_WhenExists() {
         UserEntity user = createTestUser("testuser", "test@example.com");
         UserEntity saved = userRepository.save(user);
+        userRepository.flush();
         
         Optional<UserEntity> found = userRepository.findById(saved.getId());
         
@@ -66,10 +64,10 @@ class UserRepositoryTest {
     }
 
     @Test
-    @org.junit.jupiter.api.Disabled("Transaction isolation issue - data not visible after save")
     void findByEmailAddress_ReturnsUser_WhenExists() {
         UserEntity user = createTestUser("testuser", "test@example.com");
         userRepository.save(user);
+        userRepository.flush();
         
         Optional<UserEntity> found = userRepository.findByEmailAddress("test@example.com");
         
@@ -86,10 +84,10 @@ class UserRepositoryTest {
     }
 
     @Test
-    @org.junit.jupiter.api.Disabled("Transaction isolation issue - data not visible after save")
     void findByUsername_ReturnsUser_WhenExists() {
         UserEntity user = createTestUser("testuser", "test@example.com");
         userRepository.save(user);
+        userRepository.flush();
         
         Optional<UserEntity> found = userRepository.findByUsername("testuser");
         
@@ -113,11 +111,11 @@ class UserRepositoryTest {
     }
 
     @Test
-    @org.junit.jupiter.api.Disabled("Transaction isolation issue - data not visible after save")
     void count_ReturnsCorrectCount_WhenUsersExist() {
         userRepository.save(createTestUser("user1", "user1@example.com"));
         userRepository.save(createTestUser("user2", "user2@example.com"));
         userRepository.save(createTestUser("user3", "user3@example.com"));
+        userRepository.flush();
         
         long count = userRepository.count();
         
@@ -125,13 +123,13 @@ class UserRepositoryTest {
     }
 
     @Test
-    @org.junit.jupiter.api.Disabled("Transaction isolation issue - data not visible after save")
     void findAll_WithPageable_ReturnsPagedResults() {
         // Create multiple users
         userRepository.save(createTestUser("user1", "user1@example.com"));
         userRepository.save(createTestUser("user2", "user2@example.com"));
         userRepository.save(createTestUser("user3", "user3@example.com"));
         userRepository.save(createTestUser("user4", "user4@example.com"));
+        userRepository.flush();
         
         PageRequest pageRequest = PageRequest.of(0, 2); // First page, 2 items per page
         Page<UserEntity> page = userRepository.findAll(pageRequest);
@@ -143,12 +141,12 @@ class UserRepositoryTest {
     }
 
     @Test
-    @org.junit.jupiter.api.Disabled("Transaction isolation issue - data not visible after save")
     void findAll_WithPageable_ReturnsSecondPage() {
         // Create multiple users
         userRepository.save(createTestUser("user1", "user1@example.com"));
         userRepository.save(createTestUser("user2", "user2@example.com"));
         userRepository.save(createTestUser("user3", "user3@example.com"));
+        userRepository.flush();
         
         PageRequest pageRequest = PageRequest.of(1, 2); // Second page, 2 items per page
         Page<UserEntity> page = userRepository.findAll(pageRequest);
@@ -162,8 +160,10 @@ class UserRepositoryTest {
     void deleteById_RemovesUser() {
         UserEntity user = createTestUser("testuser", "test@example.com");
         UserEntity saved = userRepository.save(user);
+        userRepository.flush();
         
         userRepository.deleteById(saved.getId());
+        userRepository.flush();
         
         Optional<UserEntity> found = userRepository.findById(saved.getId());
         assertFalse(found.isPresent());
@@ -173,10 +173,12 @@ class UserRepositoryTest {
     void update_ModifiesExistingUser() {
         UserEntity user = createTestUser("testuser", "test@example.com");
         UserEntity saved = userRepository.save(user);
+        userRepository.flush();
         
         saved.setName("Updated Name");
         saved.setUpdatedAt(LocalDateTime.now());
         UserEntity updated = userRepository.save(saved);
+        userRepository.flush();
         
         assertEquals("Updated Name", updated.getName());
         assertEquals(saved.getId(), updated.getId());

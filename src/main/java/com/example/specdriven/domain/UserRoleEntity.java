@@ -1,9 +1,10 @@
 package com.example.specdriven.domain;
 
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -11,16 +12,20 @@ import java.util.UUID;
  * Maps to the 'user_roles' join table in the database.
  * Uses composite primary key (user_id, role_id).
  */
-@Table("user_roles")
+@Entity
+@Table(name = "user_roles")
+@IdClass(UserRoleEntity.UserRoleId.class)
 public class UserRoleEntity {
 
-    @Column("user_id")
+    @Id
+    @Column(name = "user_id")
     private UUID userId;
 
-    @Column("role_id")
+    @Id
+    @Column(name = "role_id")
     private UUID roleId;
 
-    @Column("assigned_at")
+    @Column(name = "assigned_at")
     private LocalDateTime assignedAt;
 
     // Constructors
@@ -56,5 +61,50 @@ public class UserRoleEntity {
 
     public void setAssignedAt(LocalDateTime assignedAt) {
         this.assignedAt = assignedAt;
+    }
+
+    /**
+     * Composite primary key class for UserRoleEntity.
+     */
+    public static class UserRoleId implements Serializable {
+        private UUID userId;
+        private UUID roleId;
+
+        public UserRoleId() {
+        }
+
+        public UserRoleId(UUID userId, UUID roleId) {
+            this.userId = userId;
+            this.roleId = roleId;
+        }
+
+        public UUID getUserId() {
+            return userId;
+        }
+
+        public void setUserId(UUID userId) {
+            this.userId = userId;
+        }
+
+        public UUID getRoleId() {
+            return roleId;
+        }
+
+        public void setRoleId(UUID roleId) {
+            this.roleId = roleId;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            UserRoleId that = (UserRoleId) o;
+            return Objects.equals(userId, that.userId) && Objects.equals(roleId, that.roleId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(userId, roleId);
+        }
     }
 }

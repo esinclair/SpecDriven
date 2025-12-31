@@ -33,10 +33,15 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
-  # JDBC Configuration
-  jdbc:
-    template:
-      query-timeout: 5
+  # JPA/Hibernate Configuration
+  jpa:
+    hibernate:
+      ddl-auto: none  # Let Flyway handle schema
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
 
 # Server Configuration
 server:
