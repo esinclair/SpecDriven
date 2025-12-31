@@ -1,11 +1,19 @@
 package com.example.specdriven.config;
 
+import com.example.specdriven.api.model.ErrorResponse;
+import com.example.specdriven.exception.ErrorResponseFactory;
+import com.example.specdriven.security.JwtAuthenticationFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Spring Security configuration for the application.
@@ -20,6 +28,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ObjectMapper objectMapper;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, ObjectMapper objectMapper) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.objectMapper = objectMapper;
+    }
 
     /**
      * Configure the security filter chain.
@@ -50,6 +66,11 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             
+            // Configure exception handling for authentication errors
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(authenticationEntryPoint())
+            )
+            
             // Stateless session management (no server-side sessions)
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -64,8 +85,25 @@ public class SecurityConfig {
             // Allow H2 console frames (for development only)
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin())
-            );
+            )
+            
+            // Add JWT authentication filter before UsernamePasswordAuthenticationFilter
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    /**
+     * Custom authentication entry point for handling 401 responses.
+     * Returns JSON error response when authentication is required but not provided.
+     */
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            ErrorResponse error = ErrorResponseFactory.authenticationRequired("Authentication required");
+            objectMapper.writeValue(response.getOutputStream(), error);
+        };
     }
 }

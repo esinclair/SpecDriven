@@ -146,26 +146,26 @@
 
 ### Tests for User Story 2 (MANDATORY)
 
-- [ ] T048 [P] [US2] Create LoginIntegrationTest.java in src/test/java/com/example/specdriven/integration/LoginIntegrationTest.java with @SpringBootTest
-- [ ] T049 [P] [US2] Add test in LoginIntegrationTest.java: login_ValidCredentials_ReturnsToken creating a user, logging in, and verifying 200 response with token
-- [ ] T050 [P] [US2] Add test in LoginIntegrationTest.java: login_ValidToken_AllowsAccessToProtectedEndpoint verifying token works for authenticated requests
-- [ ] T051 [P] [US2] Add test in LoginIntegrationTest.java: login_InvalidPassword_Returns400 testing wrong password returns 400 with AUTHENTICATION_FAILED
-- [ ] T052 [P] [US2] Add test in LoginIntegrationTest.java: login_UnknownUsername_Returns400WithSameError verifying unknown username returns same error as wrong password (non-enumeration)
-- [ ] T053 [P] [US2] Add test in LoginIntegrationTest.java: login_MissingFields_Returns400ValidationFailed testing missing required fields returns VALIDATION_FAILED
-- [ ] T054 [P] [US2] Add test in LoginIntegrationTest.java: protectedEndpoint_NoToken_Returns401 verifying requests without token return 401 AUTHENTICATION_REQUIRED
-- [ ] T055 [P] [US2] Add test in LoginIntegrationTest.java: protectedEndpoint_ExpiredToken_Returns401 verifying expired tokens return 401 AUTHENTICATION_FAILED
-- [ ] T056 [P] [US2] Add test in LoginIntegrationTest.java: protectedEndpoint_MalformedToken_Returns401 verifying malformed Authorization header returns 401
-- [ ] T057 [P] [US2] Create JwtTokenProviderTest.java in src/test/java/com/example/specdriven/security/JwtTokenProviderTest.java with unit tests for token generation and validation
+- [X] T048 [P] [US2] Create LoginIntegrationTest.java in src/test/java/com/example/specdriven/integration/LoginIntegrationTest.java with @SpringBootTest
+- [X] T049 [P] [US2] Add test in LoginIntegrationTest.java: login_ValidCredentials_ReturnsToken creating a user, logging in, and verifying 200 response with token
+- [X] T050 [P] [US2] Add test in LoginIntegrationTest.java: login_ValidToken_AllowsAccessToProtectedEndpoint verifying token works for authenticated requests
+- [X] T051 [P] [US2] Add test in LoginIntegrationTest.java: login_InvalidPassword_Returns400 testing wrong password returns 400 with AUTHENTICATION_FAILED
+- [X] T052 [P] [US2] Add test in LoginIntegrationTest.java: login_UnknownUsername_Returns400WithSameError verifying unknown username returns same error as wrong password (non-enumeration)
+- [X] T053 [P] [US2] Add test in LoginIntegrationTest.java: login_MissingFields_Returns400ValidationFailed testing missing required fields returns VALIDATION_FAILED
+- [X] T054 [P] [US2] Add test in LoginIntegrationTest.java: protectedEndpoint_NoToken_Returns401 verifying requests without token return 401 AUTHENTICATION_REQUIRED
+- [X] T055 [P] [US2] Add test in LoginIntegrationTest.java: protectedEndpoint_ExpiredToken_Returns401 verifying expired tokens return 401 AUTHENTICATION_FAILED
+- [X] T056 [P] [US2] Add test in LoginIntegrationTest.java: protectedEndpoint_MalformedToken_Returns401 verifying malformed Authorization header returns 401
+- [X] T057 [P] [US2] Create JwtTokenProviderTest.java in src/test/java/com/example/specdriven/security/JwtTokenProviderTest.java with unit tests for token generation and validation
 
 ### Implementation for User Story 2
 
-- [ ] T058 [P] [US2] Create JwtTokenProvider.java in src/main/java/com/example/specdriven/security/JwtTokenProvider.java with @Component, methods generateToken(userId), validateToken(token), getUserIdFromToken(token) using jjwt library
-- [ ] T059 [US2] Create JwtAuthenticationFilter.java in src/main/java/com/example/specdriven/security/JwtAuthenticationFilter.java extending OncePerRequestFilter to extract Bearer token, validate with JwtTokenProvider, set Spring Security authentication context
-- [ ] T060 [US2] Update SecurityConfig.java to add JwtAuthenticationFilter to filter chain before UsernamePasswordAuthenticationFilter
-- [ ] T061 [US2] Create LoginService.java in src/main/java/com/example/specdriven/service/LoginService.java with @Service @Transactional methods: login(LoginRequest) → LoginResponse validating credentials with BCrypt and returning JWT token
-- [ ] T062 [US2] Implement non-enumeration in LoginService.java: always hash password even if user not found, return same error for unknown username and wrong password
-- [ ] T063 [US2] Create LoginController.java in src/main/java/com/example/specdriven/controller/LoginController.java implementing generated LoginApi interface, delegating to LoginService
-- [ ] T064 [US2] Update SecurityConfig.java to permit /login endpoint without authentication
+- [X] T058 [P] [US2] Create JwtTokenProvider.java in src/main/java/com/example/specdriven/security/JwtTokenProvider.java with @Component, methods generateToken(userId), validateToken(token), getUserIdFromToken(token) using jjwt library
+- [X] T059 [US2] Create JwtAuthenticationFilter.java in src/main/java/com/example/specdriven/security/JwtAuthenticationFilter.java extending OncePerRequestFilter to extract Bearer token, validate with JwtTokenProvider, set Spring Security authentication context
+- [X] T060 [US2] Update SecurityConfig.java to add JwtAuthenticationFilter to filter chain before UsernamePasswordAuthenticationFilter
+- [X] T061 [US2] Create LoginService.java in src/main/java/com/example/specdriven/service/LoginService.java with @Service @Transactional methods: login(LoginRequest) → LoginResponse validating credentials with BCrypt and returning JWT token
+- [X] T062 [US2] Implement non-enumeration in LoginService.java: always hash password even if user not found, return same error for unknown username and wrong password
+- [X] T063 [US2] Create LoginController.java in src/main/java/com/example/specdriven/controller/LoginController.java implementing generated LoginApi interface, delegating to LoginService
+- [X] T064 [US2] Update SecurityConfig.java to permit /login endpoint without authentication
 
 **Checkpoint**: Authentication is fully functional - users can login and use tokens for protected endpoints
 
@@ -179,29 +179,29 @@
 
 ### Tests for User Story 3 (MANDATORY)
 
-- [ ] T065 [P] [US3] Create UserCrudIntegrationTest.java in src/test/java/com/example/specdriven/integration/UserCrudIntegrationTest.java with @SpringBootTest
-- [ ] T066 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_ValidData_Returns201 testing authenticated user creation returns 201 with User object including ID
-- [ ] T067 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_PasswordNotInResponse verifying password field not returned in User response
-- [ ] T068 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_ValidId_Returns200 testing GET /users/{id} returns 200 with user details
-- [ ] T069 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_MissingRequiredFields_Returns400 testing validation failures return 400 VALIDATION_FAILED
-- [ ] T070 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_InvalidEmailFormat_Returns400 testing invalid email format returns 400 VALIDATION_FAILED
-- [ ] T071 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_DuplicateEmail_Returns409 testing duplicate email returns 409 CONFLICT
-- [ ] T072 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NotFound_Returns404 testing non-existent user ID returns 404 RESOURCE_NOT_FOUND
-- [ ] T073 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_NoAuth_Returns401 testing user creation without auth returns 401
-- [ ] T074 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NoAuth_Returns401 testing GET without auth returns 401
+- [X] T065 [P] [US3] Create UserCrudIntegrationTest.java in src/test/java/com/example/specdriven/integration/UserCrudIntegrationTest.java with @SpringBootTest
+- [X] T066 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_ValidData_Returns201 testing authenticated user creation returns 201 with User object including ID
+- [X] T067 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_PasswordNotInResponse verifying password field not returned in User response
+- [X] T068 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_ValidId_Returns200 testing GET /users/{id} returns 200 with user details
+- [X] T069 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_MissingRequiredFields_Returns400 testing validation failures return 400 VALIDATION_FAILED
+- [X] T070 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_InvalidEmailFormat_Returns400 testing invalid email format returns 400 VALIDATION_FAILED
+- [X] T071 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_DuplicateEmail_Returns409 testing duplicate email returns 409 CONFLICT
+- [X] T072 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NotFound_Returns404 testing non-existent user ID returns 404 RESOURCE_NOT_FOUND
+- [X] T073 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_NoAuth_Returns401 testing user creation without auth returns 401
+- [X] T074 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NoAuth_Returns401 testing GET without auth returns 401
 - [ ] T075 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_DatabaseUnavailable_Returns503 testing transient DB failure returns 503 SERVICE_UNAVAILABLE
-- [ ] T076 [P] [US3] Create UserServiceTest.java in src/test/java/com/example/specdriven/service/UserServiceTest.java with unit tests for service layer logic using Mockito
-- [ ] T077 [P] [US3] Create UserMapperTest.java in src/test/java/com/example/specdriven/mapper/UserMapperTest.java with unit tests for DTO/entity conversions
+- [X] T076 [P] [US3] Create UserServiceTest.java in src/test/java/com/example/specdriven/service/UserServiceTest.java with unit tests for service layer logic using Mockito
+- [X] T077 [P] [US3] Create UserMapperTest.java in src/test/java/com/example/specdriven/mapper/UserMapperTest.java with unit tests for DTO/entity conversions
 
 ### Implementation for User Story 3
 
-- [ ] T078 [P] [US3] Create UserMapper.java in src/main/java/com/example/specdriven/mapper/UserMapper.java with @Component methods: toEntity(CreateUserRequest), toDto(UserEntity, List<RoleEntity>), toEntity(UpdateUserRequest, UserEntity) - hash passwords with BCryptPasswordEncoder, never map password to DTO
-- [ ] T079 [US3] Create UserService.java in src/main/java/com/example/specdriven/service/UserService.java with @Service @Transactional methods: createUser(CreateUserRequest) → User, getUserById(UUID) → User, validateEmailUniqueness
-- [ ] T080 [US3] Implement email uniqueness validation in UserService.java: check UserRepository.findByEmail before create, throw ConflictException if exists
-- [ ] T081 [US3] Implement password hashing in UserMapper.java: call passwordEncoder.encode() when mapping CreateUserRequest to UserEntity
-- [ ] T082 [US3] Create UsersController.java in src/main/java/com/example/specdriven/controller/UsersController.java implementing generated UsersApi interface with createUser() and getUserById() methods delegating to UserService
-- [ ] T083 [US3] Ensure UsersController validates inputs using @Valid annotation on request parameters
-- [ ] T084 [US3] Load user's roles in UserService.getUserById() by querying UserRoleRepository and RoleRepository, pass to UserMapper.toDto()
+- [X] T078 [P] [US3] Create UserMapper.java in src/main/java/com/example/specdriven/mapper/UserMapper.java with @Component methods: toEntity(CreateUserRequest), toDto(UserEntity, List<RoleEntity>), toEntity(UpdateUserRequest, UserEntity) - hash passwords with BCryptPasswordEncoder, never map password to DTO
+- [X] T079 [US3] Create UserService.java in src/main/java/com/example/specdriven/service/UserService.java with @Service @Transactional methods: createUser(CreateUserRequest) → User, getUserById(UUID) → User, validateEmailUniqueness
+- [X] T080 [US3] Implement email uniqueness validation in UserService.java: check UserRepository.findByEmail before create, throw ConflictException if exists
+- [X] T081 [US3] Implement password hashing in UserMapper.java: call passwordEncoder.encode() when mapping CreateUserRequest to UserEntity
+- [X] T082 [US3] Create UsersController.java in src/main/java/com/example/specdriven/controller/UsersController.java implementing generated UsersApi interface with createUser() and getUserById() methods delegating to UserService
+- [X] T083 [US3] Ensure UsersController validates inputs using @Valid annotation on request parameters
+- [X] T084 [US3] Load user's roles in UserService.getUserById() by querying UserRoleRepository and RoleRepository, pass to UserMapper.toDto()
 
 **Checkpoint**: Users can be created with authentication and retrieved with full role information, passwords are hashed and never returned
 
@@ -215,27 +215,27 @@
 
 ### Tests for User Story 4 (MANDATORY)
 
-- [ ] T089 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_ValidData_Returns200 testing PUT /users/{id} with valid data returns 200 with updated User
-- [ ] T090 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_PartialUpdate_UpdatesOnlyProvidedFields testing partial updates work correctly
-- [ ] T091 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_PasswordChange_HashesNewPassword testing password update works and is hashed
-- [ ] T092 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_ValidId_Returns204 testing DELETE /users/{id} returns 204
-- [ ] T093 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_VerifyDeleted_Returns404 testing GET after DELETE returns 404
+- [X] T089 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_ValidData_Returns200 testing PUT /users/{id} with valid data returns 200 with updated User
+- [X] T090 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_PartialUpdate_UpdatesOnlyProvidedFields testing partial updates work correctly
+- [X] T091 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_PasswordChange_HashesNewPassword testing password update works and is hashed
+- [X] T092 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_ValidId_Returns204 testing DELETE /users/{id} returns 204
+- [X] T093 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_VerifyDeleted_Returns404 testing GET after DELETE returns 404
 - [ ] T094 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_CascadesRoleAssignments verifying role assignments deleted when user deleted
-- [ ] T095 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_InvalidData_Returns400 testing invalid field values return 400 VALIDATION_FAILED
-- [ ] T096 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_NotFound_Returns404 testing update non-existent user returns 404 RESOURCE_NOT_FOUND
-- [ ] T097 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_NotFound_Returns404 testing delete non-existent user returns 404 RESOURCE_NOT_FOUND
-- [ ] T098 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_DuplicateEmail_Returns409 testing email conflict on update returns 409 CONFLICT
-- [ ] T099 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_NoAuth_Returns401 testing update without auth returns 401
-- [ ] T100 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_NoAuth_Returns401 testing delete without auth returns 401
+- [X] T095 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_InvalidData_Returns400 testing invalid field values return 400 VALIDATION_FAILED
+- [X] T096 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_NotFound_Returns404 testing update non-existent user returns 404 RESOURCE_NOT_FOUND
+- [X] T097 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_NotFound_Returns404 testing delete non-existent user returns 404 RESOURCE_NOT_FOUND
+- [X] T098 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_DuplicateEmail_Returns409 testing email conflict on update returns 409 CONFLICT
+- [X] T099 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_NoAuth_Returns401 testing update without auth returns 401
+- [X] T100 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_NoAuth_Returns401 testing delete without auth returns 401
 
 ### Implementation for User Story 4
 
-- [ ] T101 [US4] Add updateUser(UUID, UpdateUserRequest) method to UserService.java: fetch existing user, validate uniqueness if email changed, apply updates via UserMapper, save updated entity, return User DTO
-- [ ] T102 [US4] Add deleteUser(UUID) method to UserService.java: check user exists, delete from UserRepository (cascade deletes user_roles automatically via DB FK constraint)
-- [ ] T103 [US4] Update UserMapper.java with updateEntity(UpdateUserRequest, UserEntity) method for partial updates: only update non-null fields, hash password if provided
-- [ ] T104 [US4] Implement updateUser() and deleteUser() methods in UsersController.java delegating to UserService with @Valid validation
-- [ ] T105 [US4] Update updated_at timestamp in UserEntity when updating via UserService (set to current timestamp)
-- [ ] T106 [US4] Verify Flyway migration includes ON DELETE CASCADE for user_roles.user_id foreign key to ensure role assignments are deleted
+- [X] T101 [US4] Add updateUser(UUID, UpdateUserRequest) method to UserService.java: fetch existing user, validate uniqueness if email changed, apply updates via UserMapper, save updated entity, return User DTO
+- [X] T102 [US4] Add deleteUser(UUID) method to UserService.java: check user exists, delete from UserRepository (cascade deletes user_roles automatically via DB FK constraint)
+- [X] T103 [US4] Update UserMapper.java with updateEntity(UpdateUserRequest, UserEntity) method for partial updates: only update non-null fields, hash password if provided
+- [X] T104 [US4] Implement updateUser() and deleteUser() methods in UsersController.java delegating to UserService with @Valid validation
+- [X] T105 [US4] Update updated_at timestamp in UserEntity when updating via UserService (set to current timestamp)
+- [X] T106 [US4] Verify Flyway migration includes ON DELETE CASCADE for user_roles.user_id foreign key to ensure role assignments are deleted
 
 **Checkpoint**: Users can be updated with partial data and deleted; role assignments cascade delete; all validations work
 
