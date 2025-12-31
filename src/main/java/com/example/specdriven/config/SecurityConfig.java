@@ -14,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * Security Rules:
  * - /ping: Always accessible (no authentication required)
  * - /login: Accessible without authentication
- * - /users/**: Requires authentication (JWT bearer token)
+ * - /users/**: Requires authentication (JWT bearer token) for all operations
  * - All other endpoints: Require authentication by default
  */
 @Configuration

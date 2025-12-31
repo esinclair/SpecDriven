@@ -290,7 +290,7 @@ The application follows a classic layered architecture:
 2. **Service Layer**
    - Contains all business logic and validation
    - Orchestrates repository calls
-   - Enforces business rules (e.g., email uniqueness, bootstrap mode)
+   - Enforces business rules (e.g., email uniqueness)
    - Transactional boundaries defined here
 
 3. **Repository Layer** (Data Access)

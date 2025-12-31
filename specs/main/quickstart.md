@@ -117,39 +117,9 @@ curl http://localhost:8080/ping
 
 ## First Workflows
 
-### Workflow 1: Bootstrap Mode - Create First User
+### Workflow 1: Login and Get Token
 
-When the database is empty (zero users), you can create the first user **without authentication**:
-
-```bash
-curl -X POST http://localhost:8080/users \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "admin",
-    "name": "Admin User",
-    "password": "admin123",
-    "emailAddress": "admin@example.com"
-  }'
-```
-
-**Expected response** (201 Created):
-```json
-{
-  "id": "123e4567-e89b-12d3-a456-426614174000",
-  "username": "admin",
-  "name": "Admin User",
-  "emailAddress": "admin@example.com",
-  "roles": []
-}
-```
-
-**Note**: Password is **not** returned in response (security).
-
----
-
-### Workflow 2: Login and Get Token
-
-After the first user exists, all operations require authentication. Login to get a token:
+To access protected endpoints, you need to authenticate and obtain a bearer token. First, ensure you have a user in the system (you may need to create one via a database script or admin tool). Then login:
 
 ```bash
 curl -X POST http://localhost:8080/login \
@@ -172,9 +142,9 @@ curl -X POST http://localhost:8080/login \
 
 ---
 
-### Workflow 3: Create Another User (Authenticated)
+### Workflow 2: Create a User (Authenticated)
 
-Once you have a token, create additional users:
+With your token, you can create new users:
 
 ```bash
 TOKEN="<your-token-from-login>"
@@ -227,7 +197,7 @@ curl http://localhost:8080/users/$USER_ID \
 
 ---
 
-### Workflow 5: Assign a Role
+### Workflow 4: Assign a Role
 
 Assign the USER role to a user:
 
@@ -391,7 +361,7 @@ curl -X POST http://localhost:8080/login \
 
 ### Scenario: Missing Authentication
 
-Try to create user after bootstrap mode (without token):
+Try to create a user without authentication token:
 
 ```bash
 curl -X POST http://localhost:8080/users \
@@ -626,13 +596,12 @@ export SERVER_PORT=9090
 
 | Endpoint | Method | Auth | Description |
 |----------|--------|------|-------------|
-| `/users` | POST | Conditional* | Create user (bootstrap: no auth; otherwise: required) |
+| `/users` | POST | Yes | Create user (authentication required) |
 | `/users` | GET | Yes | List users (paginated) |
 | `/users/{id}` | GET | Yes | Get user by ID |
 | `/users/{id}` | PUT | Yes | Update user |
 | `/users/{id}` | DELETE | Yes | Delete user |
 
-*Bootstrap mode: No auth if zero users exist
 
 ### Roles
 

@@ -31,15 +31,10 @@ paths:
     post:
       security:
         - bearerAuth: []
-        - {}
       operationId: createUser
       summary: Create a new user
       description: |
-        Requires a valid Bearer token **unless** the system is in bootstrap state.
-
-        **Bootstrap exception**: If there are **zero users** in the database, this endpoint may be called without a Bearer token to create the first user.
-
-        After at least one user exists, this endpoint requires `Authorization: Bearer <token>`.
+        Requires a valid Bearer token for authentication.
       requestBody:
         required: true
         content:

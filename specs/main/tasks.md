@@ -173,7 +173,7 @@
 
 ## Phase 6: User Story 3 - Create and Retrieve Users (Priority: P1)
 
-**Goal**: Enable creating new users with validation and retrieving user details by ID; support bootstrap mode (first user creation without auth)
+**Goal**: Enable creating new users with validation and retrieving user details by ID; always require authentication for user creation
 
 **Independent Test**: Create user with valid data returns 201 with user object; retrieve user by ID returns 200 with user details including roles; password not in response
 
@@ -181,33 +181,29 @@
 
 - [ ] T065 [P] [US3] Create UserCrudIntegrationTest.java in src/test/java/com/example/specdriven/integration/UserCrudIntegrationTest.java with @SpringBootTest
 - [ ] T066 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_ValidData_Returns201 testing authenticated user creation returns 201 with User object including ID
-- [ ] T067 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_BootstrapMode_NoAuthRequired testing first user creation works without Bearer token
-- [ ] T068 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_AfterBootstrap_RequiresAuth testing second user creation requires authentication
-- [ ] T069 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_PasswordNotInResponse verifying password field not returned in User response
-- [ ] T070 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_ValidId_Returns200 testing GET /users/{id} returns 200 with user details
-- [ ] T071 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_MissingRequiredFields_Returns400 testing validation failures return 400 VALIDATION_FAILED
-- [ ] T072 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_InvalidEmailFormat_Returns400 testing invalid email format returns 400 VALIDATION_FAILED
-- [ ] T073 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_DuplicateEmail_Returns409 testing duplicate email returns 409 CONFLICT
-- [ ] T074 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NotFound_Returns404 testing non-existent user ID returns 404 RESOURCE_NOT_FOUND
-- [ ] T075 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_NoAuth_Returns401 testing user creation without auth (post-bootstrap) returns 401
-- [ ] T076 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NoAuth_Returns401 testing GET without auth returns 401
-- [ ] T077 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_DatabaseUnavailable_Returns503 testing transient DB failure returns 503 SERVICE_UNAVAILABLE
-- [ ] T078 [P] [US3] Create UserServiceTest.java in src/test/java/com/example/specdriven/service/UserServiceTest.java with unit tests for service layer logic using Mockito
-- [ ] T079 [P] [US3] Create UserMapperTest.java in src/test/java/com/example/specdriven/mapper/UserMapperTest.java with unit tests for DTO/entity conversions
+- [ ] T067 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_PasswordNotInResponse verifying password field not returned in User response
+- [ ] T068 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_ValidId_Returns200 testing GET /users/{id} returns 200 with user details
+- [ ] T069 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_MissingRequiredFields_Returns400 testing validation failures return 400 VALIDATION_FAILED
+- [ ] T070 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_InvalidEmailFormat_Returns400 testing invalid email format returns 400 VALIDATION_FAILED
+- [ ] T071 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_DuplicateEmail_Returns409 testing duplicate email returns 409 CONFLICT
+- [ ] T072 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NotFound_Returns404 testing non-existent user ID returns 404 RESOURCE_NOT_FOUND
+- [ ] T073 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_NoAuth_Returns401 testing user creation without auth returns 401
+- [ ] T074 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NoAuth_Returns401 testing GET without auth returns 401
+- [ ] T075 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_DatabaseUnavailable_Returns503 testing transient DB failure returns 503 SERVICE_UNAVAILABLE
+- [ ] T076 [P] [US3] Create UserServiceTest.java in src/test/java/com/example/specdriven/service/UserServiceTest.java with unit tests for service layer logic using Mockito
+- [ ] T077 [P] [US3] Create UserMapperTest.java in src/test/java/com/example/specdriven/mapper/UserMapperTest.java with unit tests for DTO/entity conversions
 
 ### Implementation for User Story 3
 
-- [ ] T080 [P] [US3] Create UserMapper.java in src/main/java/com/example/specdriven/mapper/UserMapper.java with @Component methods: toEntity(CreateUserRequest), toDto(UserEntity, List<RoleEntity>), toEntity(UpdateUserRequest, UserEntity) - hash passwords with BCryptPasswordEncoder, never map password to DTO
-- [ ] T081 [US3] Create UserService.java in src/main/java/com/example/specdriven/service/UserService.java with @Service @Transactional methods: createUser(CreateUserRequest) → User, getUserById(UUID) → User, validateEmailUniqueness, checkBootstrapMode
-- [ ] T082 [US3] Implement bootstrap mode logic in UserService.java: allow user creation without auth if countUsers() == 0
-- [ ] T083 [US3] Implement email uniqueness validation in UserService.java: check UserRepository.findByEmail before create, throw ConflictException if exists
-- [ ] T084 [US3] Implement password hashing in UserMapper.java: call passwordEncoder.encode() when mapping CreateUserRequest to UserEntity
-- [ ] T085 [US3] Create UsersController.java in src/main/java/com/example/specdriven/controller/UsersController.java implementing generated UsersApi interface with createUser() and getUserById() methods delegating to UserService
-- [ ] T086 [US3] Update SecurityConfig.java to allow POST /users without authentication in bootstrap mode (use custom filter or permit matcher)
-- [ ] T087 [US3] Ensure UsersController validates inputs using @Valid annotation on request parameters
-- [ ] T088 [US3] Load user's roles in UserService.getUserById() by querying UserRoleRepository and RoleRepository, pass to UserMapper.toDto()
+- [ ] T078 [P] [US3] Create UserMapper.java in src/main/java/com/example/specdriven/mapper/UserMapper.java with @Component methods: toEntity(CreateUserRequest), toDto(UserEntity, List<RoleEntity>), toEntity(UpdateUserRequest, UserEntity) - hash passwords with BCryptPasswordEncoder, never map password to DTO
+- [ ] T079 [US3] Create UserService.java in src/main/java/com/example/specdriven/service/UserService.java with @Service @Transactional methods: createUser(CreateUserRequest) → User, getUserById(UUID) → User, validateEmailUniqueness
+- [ ] T080 [US3] Implement email uniqueness validation in UserService.java: check UserRepository.findByEmail before create, throw ConflictException if exists
+- [ ] T081 [US3] Implement password hashing in UserMapper.java: call passwordEncoder.encode() when mapping CreateUserRequest to UserEntity
+- [ ] T082 [US3] Create UsersController.java in src/main/java/com/example/specdriven/controller/UsersController.java implementing generated UsersApi interface with createUser() and getUserById() methods delegating to UserService
+- [ ] T083 [US3] Ensure UsersController validates inputs using @Valid annotation on request parameters
+- [ ] T084 [US3] Load user's roles in UserService.getUserById() by querying UserRoleRepository and RoleRepository, pass to UserMapper.toDto()
 
-**Checkpoint**: Users can be created (bootstrap mode working) and retrieved with full role information, passwords are hashed and never returned
+**Checkpoint**: Users can be created with authentication and retrieved with full role information, passwords are hashed and never returned
 
 ---
 
@@ -379,12 +375,11 @@
 - [ ] T172 Run ./gradlew clean build and verify all tests pass (unit + integration)
 - [ ] T173 Verify OpenAPI code regenerates cleanly with ./gradlew openApiGenerate (no manual edits to generated code)
 - [ ] T174 Start application with ./gradlew bootRun and manually test health check endpoint
-- [ ] T175 Manually test bootstrap mode: create first user without auth, verify second user requires auth
-- [ ] T176 Manually test authentication flow: login, get token, use token for CRUD operations
-- [ ] T177 Manually test feature flag: disable FeatureFlag.usersApi, verify endpoints return 404, verify /ping still works
-- [ ] T178 Run quickstart.md validation: follow all steps in quickstart.md and verify they work
-- [ ] T179 Generate and review test coverage report to ensure adequate coverage of happy paths and negative scenarios
-- [ ] T180 Verify build artifact is created: build/libs/SpecDriven-0.0.1-SNAPSHOT.jar exists and is executable
+- [ ] T175 Manually test authentication flow: login, get token, use token for CRUD operations
+- [ ] T176 Manually test feature flag: disable FeatureFlag.usersApi, verify endpoints return 404, verify /ping still works
+- [ ] T177 Run quickstart.md validation: follow all steps in quickstart.md and verify they work
+- [ ] T178 Generate and review test coverage report to ensure adequate coverage of happy paths and negative scenarios
+- [ ] T179 Verify build artifact is created: build/libs/SpecDriven-0.0.1-SNAPSHOT.jar exists and is executable
 
 ---
 
@@ -485,7 +480,7 @@ Foundational (Phase 2) [BLOCKING]
 **MVP Scope**: ~4-5 days of focused development
 - Health check works
 - Users can login and get tokens
-- Users can be created (bootstrap mode) and retrieved
+- Users can be created with proper authentication and retrieved
 - All tests pass
 - Feature flag controls access
 
