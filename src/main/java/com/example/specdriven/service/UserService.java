@@ -287,8 +287,8 @@ public class UserService {
                     .filter(user -> matchesFilters(user, username, emailAddress, name))
                     .collect(Collectors.toList());
             
-            // Calculate proper pagination offset
-            int start = (int) pageable.getOffset();
+            // Calculate proper pagination offset (safely convert long to int)
+            int start = Math.toIntExact(pageable.getOffset());
             int end = Math.min(filtered.size(), start + pageable.getPageSize());
             
             // Handle case where start exceeds filtered size
@@ -304,10 +304,6 @@ public class UserService {
         }
 
         return usersWithRole;
-    }
-
-    private int pageSize(Pageable pageable) {
-        return pageable.getPageSize();
     }
 
     /**
