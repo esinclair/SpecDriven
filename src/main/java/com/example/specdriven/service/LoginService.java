@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Optional;
 
 /**
@@ -22,9 +24,6 @@ import java.util.Optional;
 public class LoginService {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
-    
-    // Dummy password for non-enumeration - used when user not found to ensure constant-time comparison
-    private static final String DUMMY_PASSWORD = "dummy_password_for_timing_attack_prevention";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -39,8 +38,18 @@ public class LoginService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
-        // Generate dummy hash using the same encoder for consistent timing
-        this.dummyHash = passwordEncoder.encode(DUMMY_PASSWORD);
+        // Generate dummy hash with a secure random password for timing attack prevention
+        this.dummyHash = passwordEncoder.encode(generateSecureRandomPassword());
+    }
+
+    /**
+     * Generate a secure random password for dummy hash creation.
+     * This prevents timing analysis attacks by ensuring password comparison always occurs.
+     */
+    private static String generateSecureRandomPassword() {
+        byte[] randomBytes = new byte[32];
+        new SecureRandom().nextBytes(randomBytes);
+        return Base64.getEncoder().encodeToString(randomBytes);
     }
 
     /**

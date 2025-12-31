@@ -89,12 +89,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * Check if the request path is a public endpoint that doesn't require authentication.
+     * H2 console and test endpoints are only accessible in non-production environments.
      */
     private boolean isPublicEndpoint(String requestPath) {
-        return requestPath.equals("/ping") ||
-               requestPath.equals("/login") ||
-               requestPath.startsWith("/test/") ||
-               requestPath.startsWith("/h2-console");
+        // Always public endpoints
+        if (requestPath.equals("/ping") || requestPath.equals("/login")) {
+            return true;
+        }
+        
+        // Development/test only endpoints - disabled in production
+        String profile = System.getProperty("spring.profiles.active", "");
+        boolean isProd = profile.contains("prod") || profile.contains("production");
+        
+        if (!isProd) {
+            return requestPath.startsWith("/test/") || requestPath.startsWith("/h2-console");
+        }
+        
+        return false;
     }
 
     /**

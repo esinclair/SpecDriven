@@ -32,14 +32,27 @@ public class JwtTokenProvider {
         this.jwtConfig = jwtConfig;
         String secret = jwtConfig.getSecret();
         
+        // Validate secret is not empty
+        if (secret == null || secret.isEmpty()) {
+            throw new IllegalStateException("JWT secret must not be empty. " +
+                    "Set the jwt.secret property or JWT_SECRET environment variable.");
+        }
+        
         // Validate secret length for security
-        if (secret == null || secret.length() < MINIMUM_SECRET_LENGTH) {
-            logger.warn("JWT secret is too short ({} chars). For production, use at least {} characters. " +
-                       "Set the jwt.secret property or JWT_SECRET environment variable.",
-                       secret != null ? secret.length() : 0, MINIMUM_SECRET_LENGTH);
-            // In production, this should throw an exception. For development/testing, we allow it.
-            if (secret == null || secret.isEmpty()) {
-                throw new IllegalStateException("JWT secret must not be empty");
+        if (secret.length() < MINIMUM_SECRET_LENGTH) {
+            String profile = System.getProperty("spring.profiles.active", "");
+            boolean isProd = profile.contains("prod") || profile.contains("production");
+            
+            if (isProd) {
+                throw new IllegalStateException(
+                        String.format("JWT secret is too short (%d chars). " +
+                                "Production requires at least %d characters for security. " +
+                                "Set the jwt.secret property or JWT_SECRET environment variable.",
+                                secret.length(), MINIMUM_SECRET_LENGTH));
+            } else {
+                logger.warn("JWT secret is too short ({} chars). For production, use at least {} characters. " +
+                           "Set the jwt.secret property or JWT_SECRET environment variable.",
+                           secret.length(), MINIMUM_SECRET_LENGTH);
             }
         }
         
