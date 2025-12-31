@@ -17,7 +17,7 @@ spring:
 
   # Test Database Configuration (H2 in-memory)
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password:
