@@ -1,64 +1,108 @@
 # SpecDriven Application Configuration
+# Main configuration file for the User Management API System
 
 # Feature Flags
+# Control feature availability without code changes
 feature-flag:
-  users-api: false  # Default: disabled until validated
+  # Enable/disable the Users API endpoints (property name: feature-flag.users-api)
+  # When false: /users/**, /login return 404 (feature not revealed)
+  # When true: API endpoints are accessible
+  # Default: false (disabled until validated in production)
+  users-api: false
 
 # JWT Configuration
+# JSON Web Token settings for authentication
 jwt:
+  # Secret key for signing JWT tokens
+  # IMPORTANT: Change this in production! Use a strong, random 256-bit key
+  # Can be overridden with JWT_SECRET environment variable
   secret: ${JWT_SECRET:default-secret-change-in-production-this-is-not-secure}
-  expirationMs: 86400000  # 24 hours in milliseconds
+  
+  # Token expiration time in milliseconds
+  # 86400000 = 24 hours
+  expirationMs: 86400000
 
 # Spring Boot Configuration
 spring:
   application:
+    # Application name used in logs and metrics
     name: SpecDriven
 
-  # Database Configuration (H2 in-memory)
+  # Database Configuration
+  # Using H2 in-memory database in PostgreSQL compatibility mode
   datasource:
+    # H2 in-memory database with PostgreSQL mode for SQL compatibility
+    # DB_CLOSE_DELAY=-1 keeps database alive while JVM runs
+    # DATABASE_TO_UPPER=FALSE preserves case for identifiers
     url: jdbc:h2:mem:specdriven;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password:
 
-  # H2 Console (for development/debugging)
+  # H2 Console (Development Only)
+  # Web-based database console for debugging
   h2:
     console:
+      # Enable H2 console for local development
+      # DISABLE in production for security
       enabled: true
+      # Access URL: http://localhost:8080/h2-console
       path: /h2-console
 
   # Flyway Database Migrations
+  # Manages database schema versioning and migrations
   flyway:
+    # Enable automatic database migrations on startup
     enabled: true
+    # Location of migration scripts
     locations: classpath:db/migration
+    # Create baseline for existing databases
     baseline-on-migrate: true
 
   # JPA/Hibernate Configuration
   jpa:
     hibernate:
-      ddl-auto: none  # Let Flyway handle schema
+      # Schema management: none = let Flyway handle it
+      # Options: none, validate, update, create, create-drop
+      ddl-auto: none
+    # Log SQL statements (enable for debugging)
     show-sql: false
     properties:
       hibernate:
+        # H2 database dialect
         dialect: org.hibernate.dialect.H2Dialect
+        # Format SQL for readability in logs
         format_sql: true
 
 # Server Configuration
 server:
+  # HTTP port for the application
+  # Override with SERVER_PORT environment variable
   port: 8080
+  
+  # Error handling configuration
   error:
+    # Include error messages in responses
     include-message: always
+    # Don't include binding errors (security)
     include-binding-errors: never
+    # Never include stack traces in responses (security)
     include-stacktrace: never
+    # Don't include exception class names (security)
     include-exception: false
 
 # Logging Configuration
 logging:
   level:
+    # Root logging level
     root: INFO
+    # Application logging level (DEBUG for development)
     com.example.specdriven: DEBUG
+    # Spring Security logging (useful for auth debugging)
     org.springframework.security: DEBUG
+    # Flyway migration logging
     org.flywaydb: INFO
   pattern:
+    # Console log format: timestamp - message
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 

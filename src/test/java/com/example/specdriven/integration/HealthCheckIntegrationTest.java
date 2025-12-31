@@ -113,4 +113,61 @@ class HealthCheckIntegrationTest {
                 .as("95th percentile response time should be under 1 second")
                 .isLessThan(1000L);
     }
+
+    /**
+     * T161: Performance smoke test making 100 requests and checking 95th percentile is under 1 second.
+     * This is a more robust performance test than the basic 20-request test.
+     */
+    @Test
+    void verify95PercentUnder1Second() {
+        // Given: 100 requests for statistical significance
+        int totalRequests = 100;
+        List<Long> responseTimes = new ArrayList<>();
+
+        // Warm up - make a few requests first
+        for (int i = 0; i < 5; i++) {
+            restTemplate.getForEntity("/ping", PingResponse.class);
+        }
+
+        // When: Make 100 requests and measure response time for each
+        for (int i = 0; i < totalRequests; i++) {
+            Instant start = Instant.now();
+            ResponseEntity<PingResponse> response = restTemplate.getForEntity("/ping", PingResponse.class);
+            Instant end = Instant.now();
+
+            // Verify each request succeeds
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            // Record response time in milliseconds
+            long responseTimeMs = Duration.between(start, end).toMillis();
+            responseTimes.add(responseTimeMs);
+        }
+
+        // Then: Sort response times to calculate 95th percentile
+        responseTimes.sort(Long::compareTo);
+
+        // Calculate 95th percentile index (95th out of 100 = index 94)
+        // For n=100, 95th percentile is at position ceil(100 * 0.95) - 1 = 94 (0-indexed)
+        int percentile95Index = Math.min(
+                (int) Math.ceil(totalRequests * 0.95) - 1,
+                totalRequests - 1  // Ensure we don't exceed array bounds
+        );
+        long percentile95Value = responseTimes.get(percentile95Index);
+
+        // Calculate average for reporting
+        double average = responseTimes.stream().mapToLong(Long::longValue).average().orElse(0);
+        long min = responseTimes.get(0);
+        long max = responseTimes.get(totalRequests - 1);
+
+        // Log performance metrics for debugging
+        System.out.printf("Performance metrics (100 requests): min=%dms, avg=%.2fms, 95th=%dms, max=%dms%n",
+                min, average, percentile95Value, max);
+
+        // Verify 95th percentile is under 1 second (1000ms)
+        assertThat(percentile95Value)
+                .as("95th percentile of 100 requests should be under 1 second. " +
+                    "Metrics: min=%dms, avg=%.2fms, 95th=%dms, max=%dms", 
+                    min, average, percentile95Value, max)
+                .isLessThan(1000L);
+    }
 }

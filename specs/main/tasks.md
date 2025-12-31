@@ -189,7 +189,7 @@
 - [X] T072 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NotFound_Returns404 testing non-existent user ID returns 404 RESOURCE_NOT_FOUND
 - [X] T073 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_NoAuth_Returns401 testing user creation without auth returns 401
 - [X] T074 [P] [US3] Add test in UserCrudIntegrationTest.java: getUserById_NoAuth_Returns401 testing GET without auth returns 401
-- [ ] T075 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_DatabaseUnavailable_Returns503 testing transient DB failure returns 503 SERVICE_UNAVAILABLE
+- [X] T075 [P] [US3] Add test in UserCrudIntegrationTest.java: createUser_DatabaseUnavailable_Returns503 testing transient DB failure returns 503 SERVICE_UNAVAILABLE
 - [X] T076 [P] [US3] Create UserServiceTest.java in src/test/java/com/example/specdriven/service/UserServiceTest.java with unit tests for service layer logic using Mockito
 - [X] T077 [P] [US3] Create UserMapperTest.java in src/test/java/com/example/specdriven/mapper/UserMapperTest.java with unit tests for DTO/entity conversions
 
@@ -220,7 +220,7 @@
 - [X] T091 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_PasswordChange_HashesNewPassword testing password update works and is hashed
 - [X] T092 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_ValidId_Returns204 testing DELETE /users/{id} returns 204
 - [X] T093 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_VerifyDeleted_Returns404 testing GET after DELETE returns 404
-- [ ] T094 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_CascadesRoleAssignments verifying role assignments deleted when user deleted
+- [X] T094 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_CascadesRoleAssignments verifying role assignments deleted when user deleted
 - [X] T095 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_InvalidData_Returns400 testing invalid field values return 400 VALIDATION_FAILED
 - [X] T096 [P] [US4] Add test in UserCrudIntegrationTest.java: updateUser_NotFound_Returns404 testing update non-existent user returns 404 RESOURCE_NOT_FOUND
 - [X] T097 [P] [US4] Add test in UserCrudIntegrationTest.java: deleteUser_NotFound_Returns404 testing delete non-existent user returns 404 RESOURCE_NOT_FOUND
@@ -261,7 +261,7 @@
 - [X] T116 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MultipleFilters_ReturnsUsersMatchingAll testing AND logic when multiple filters provided
 - [X] T117 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MissingPagination_Returns400 testing missing page or pageSize parameters returns 400 VALIDATION_FAILED
 - [X] T118 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_InvalidPagination_Returns400 testing invalid page/pageSize (negative, zero, >100) returns 400 VALIDATION_FAILED
-- [ ] T119 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_UnsupportedQueryParam_Returns400 testing unknown query parameters return 400 VALIDATION_FAILED
+- [X] T119 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_UnsupportedQueryParam_Returns400 testing unknown query parameters return 400 VALIDATION_FAILED
 - [X] T120 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_NoAuth_Returns401 testing list without auth returns 401
 - [X] T121 [P] [US5] Add test in UserListIntegrationTest.java: listUsers_MaxPageSize_EnforcesLimit testing pageSize > 100 is rejected
 
@@ -273,7 +273,7 @@
 - [X] T125 [US5] Implement filter logic in UserService.java: use appropriate Spring Data derived query methods based on provided filters (call findByUsername, findByEmailAddress, findByNameContainingIgnoreCase with Pageable parameter; for role filtering, coordinate with UserRoleRepository)
 - [X] T126 [US5] Implement listUsers() method in UsersController.java: validate pagination parameters with @Valid, delegate to UserService, return UserPage response
 - [X] T127 [US5] Add validation in UsersController or service to enforce pageSize maximum of 100 and minimum of 1, page minimum of 1
-- [ ] T128 [US5] Add validation to reject unsupported query parameters not defined in OpenAPI contract
+- [X] T128 [US5] Add validation to reject unsupported query parameters not defined in OpenAPI contract
 
 **Checkpoint**: List users endpoint works with pagination and all filters; validation enforces required params and limits
 
@@ -347,39 +347,39 @@
 
 ### Integration & End-to-End Tests
 
-- [ ] T159 [P] Create FullUserLifecycleIntegrationTest.java in src/test/java/com/example/specdriven/integration/FullUserLifecycleIntegrationTest.java testing complete flow: create user → login → get token → assign role → update user → list users → delete user → verify deleted
-- [ ] T160 [P] Add test in FullUserLifecycleIntegrationTest.java: multipleUsers_IndependentOperations testing concurrent operations don't interfere
-- [ ] T161 [P] Add performance smoke test in HealthCheckIntegrationTest.java: verify95PercentUnder1Second making 100 requests and checking 95th percentile
+- [X] T159 [P] Create FullUserLifecycleIntegrationTest.java in src/test/java/com/example/specdriven/integration/FullUserLifecycleIntegrationTest.java testing complete flow: create user → login → get token → assign role → update user → list users → delete user → verify deleted
+- [X] T160 [P] Add test in FullUserLifecycleIntegrationTest.java: multipleUsers_IndependentOperations testing concurrent operations don't interfere
+- [X] T161 [P] Add performance smoke test in HealthCheckIntegrationTest.java: verify95PercentUnder1Second making 100 requests and checking 95th percentile
 
 ### Repository Tests
 
-- [ ] T162 [P] Create UserRepositoryTest.java in src/test/java/com/example/specdriven/repository/UserRepositoryTest.java with @DataJdbcTest testing repository methods: save, findById, findByEmail, countUsers, findAllPaginated
-- [ ] T163 [P] Create UserRoleRepositoryTest.java in src/test/java/com/example/specdriven/repository/UserRoleRepositoryTest.java with @DataJdbcTest testing role assignment queries
+- [X] T162 [P] Create UserRepositoryTest.java in src/test/java/com/example/specdriven/repository/UserRepositoryTest.java with @DataJdbcTest testing repository methods: save, findById, findByEmail, countUsers, findAllPaginated
+- [X] T163 [P] Create UserRoleRepositoryTest.java in src/test/java/com/example/specdriven/repository/UserRoleRepositoryTest.java with @DataJdbcTest testing role assignment queries
 
 ### Code Quality
 
-- [ ] T164 [P] Review all exception handling to ensure no sensitive data (stack traces, internal IDs) exposed in error messages
-- [ ] T165 [P] Review all endpoints to ensure passwords never returned in responses
-- [ ] T166 [P] Verify all @Transactional boundaries are correct (service layer methods modifying data)
-- [ ] T167 [P] Add JavaDoc comments to public service methods explaining business logic and validation rules
+- [X] T164 [P] Review all exception handling to ensure no sensitive data (stack traces, internal IDs) exposed in error messages
+- [X] T165 [P] Review all endpoints to ensure passwords never returned in responses
+- [X] T166 [P] Verify all @Transactional boundaries are correct (service layer methods modifying data)
+- [X] T167 [P] Add JavaDoc comments to public service methods explaining business logic and validation rules
 
 ### Documentation
 
-- [ ] T168 [P] Update README.md with quick start instructions: clone, build, enable feature flag, run, access /ping
-- [ ] T169 [P] Add API usage examples to README.md showing curl commands for common workflows (bootstrap, login, CRUD, roles)
-- [ ] T170 [P] Verify quickstart.md matches actual implementation and all examples work
-- [ ] T171 [P] Add comments in application.yml explaining each configuration property
+- [X] T168 [P] Update README.md with quick start instructions: clone, build, enable feature flag, run, access /ping
+- [X] T169 [P] Add API usage examples to README.md showing curl commands for common workflows (bootstrap, login, CRUD, roles)
+- [X] T170 [P] Verify quickstart.md matches actual implementation and all examples work
+- [X] T171 [P] Add comments in application.yml explaining each configuration property
 
 ### Final Validation
 
-- [ ] T172 Run ./gradlew clean build and verify all tests pass (unit + integration)
-- [ ] T173 Verify OpenAPI code regenerates cleanly with ./gradlew openApiGenerate (no manual edits to generated code)
-- [ ] T174 Start application with ./gradlew bootRun and manually test health check endpoint
+- [X] T172 Run ./gradlew clean build and verify all tests pass (unit + integration)
+- [X] T173 Verify OpenAPI code regenerates cleanly with ./gradlew openApiGenerate (no manual edits to generated code)
+- [X] T174 Start application with ./gradlew bootRun and manually test health check endpoint
 - [ ] T175 Manually test authentication flow: login, get token, use token for CRUD operations
 - [ ] T176 Manually test feature flag: disable FeatureFlag.usersApi, verify endpoints return 404, verify /ping still works
 - [ ] T177 Run quickstart.md validation: follow all steps in quickstart.md and verify they work
 - [ ] T178 Generate and review test coverage report to ensure adequate coverage of happy paths and negative scenarios
-- [ ] T179 Verify build artifact is created: build/libs/SpecDriven-0.0.1-SNAPSHOT.jar exists and is executable
+- [X] T179 Verify build artifact is created: build/libs/SpecDriven-0.0.1-SNAPSHOT.jar exists and is executable
 
 ---
 

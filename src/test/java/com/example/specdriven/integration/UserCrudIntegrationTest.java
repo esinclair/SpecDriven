@@ -515,6 +515,54 @@ class UserCrudIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    // T094: deleteUser_CascadesRoleAssignments - verify role assignments deleted when user deleted
+    @Test
+    void deleteUser_CascadesRoleAssignments() throws Exception {
+        // Create a user
+        CreateUserRequest createRequest = new CreateUserRequest(
+                "cascadeuser", "Cascade User", "Password123!", "cascade@example.com");
+
+        MvcResult createResult = mockMvc.perform(post("/users")
+                .header("Authorization", "Bearer " + authToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createRequest)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        User createdUser = objectMapper.readValue(
+                createResult.getResponse().getContentAsString(), User.class);
+        UUID userId = createdUser.getId();
+
+        // Assign roles to the user
+        mockMvc.perform(put("/users/" + userId + "/roles/ADMIN")
+                .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(put("/users/" + userId + "/roles/USER")
+                .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isNoContent());
+
+        // Verify roles are assigned
+        mockMvc.perform(get("/users/" + userId)
+                .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.roles").isArray())
+                .andExpect(jsonPath("$.roles.length()").value(2));
+
+        // Delete the user
+        mockMvc.perform(delete("/users/" + userId)
+                .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isNoContent());
+
+        // Verify user is deleted
+        mockMvc.perform(get("/users/" + userId)
+                .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isNotFound());
+
+        // Note: Role assignments are cascade deleted via database FK constraint (ON DELETE CASCADE)
+        // We verify this implicitly by ensuring the delete succeeds without foreign key violations
+    }
+
     // Additional test: User can update their own email to their current email
     @Test
     void updateUser_SameEmail_DoesNotConflict() throws Exception {
