@@ -1,9 +1,13 @@
 package com.example.specdriven.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -14,6 +18,10 @@ import java.util.UUID;
 @Entity
 @Table(name = "role_permissions")
 @IdClass(RolePermissionEntity.RolePermissionId.class)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class RolePermissionEntity {
 
     @Id
@@ -24,74 +32,16 @@ public class RolePermissionEntity {
     @Column(name = "permission_id")
     private UUID permissionId;
 
-    // Constructors
-    public RolePermissionEntity() {
-    }
-
-    public RolePermissionEntity(UUID roleId, UUID permissionId) {
-        this.roleId = roleId;
-        this.permissionId = permissionId;
-    }
-
-    // Getters and Setters
-    public UUID getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(UUID roleId) {
-        this.roleId = roleId;
-    }
-
-    public UUID getPermissionId() {
-        return permissionId;
-    }
-
-    public void setPermissionId(UUID permissionId) {
-        this.permissionId = permissionId;
-    }
-
     /**
      * Composite primary key class for RolePermissionEntity.
      */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode
     public static class RolePermissionId implements Serializable {
         private UUID roleId;
         private UUID permissionId;
-
-        public RolePermissionId() {
-        }
-
-        public RolePermissionId(UUID roleId, UUID permissionId) {
-            this.roleId = roleId;
-            this.permissionId = permissionId;
-        }
-
-        public UUID getRoleId() {
-            return roleId;
-        }
-
-        public void setRoleId(UUID roleId) {
-            this.roleId = roleId;
-        }
-
-        public UUID getPermissionId() {
-            return permissionId;
-        }
-
-        public void setPermissionId(UUID permissionId) {
-            this.permissionId = permissionId;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            RolePermissionId that = (RolePermissionId) o;
-            return Objects.equals(roleId, that.roleId) && Objects.equals(permissionId, that.permissionId);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(roleId, permissionId);
-        }
     }
 }

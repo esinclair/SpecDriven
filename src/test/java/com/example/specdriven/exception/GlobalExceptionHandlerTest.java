@@ -13,8 +13,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -62,6 +64,53 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
         assertEquals(ErrorResponseFactory.VALIDATION_FAILED, response.getBody().getCode());
         assertTrue(response.getBody().getMessage().contains("Validation failed"));
+    }
+
+    @Test
+    void handleMethodArgumentNotValid_NoErrors_ReturnsGenericMessage() {
+        MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
+        BindingResult bindingResult = mock(BindingResult.class);
+        
+        when(exception.getBindingResult()).thenReturn(bindingResult);
+        when(bindingResult.hasErrors()).thenReturn(false);
+        
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler
+                .handleMethodArgumentNotValid(exception, webRequest);
+        
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Validation failed: ", response.getBody().getMessage());
+    }
+
+    @Test
+    void handleHandlerMethodValidation_WithErrors_Returns400() {
+        HandlerMethodValidationException exception = mock(HandlerMethodValidationException.class);
+        ObjectError objectError = new ObjectError("object", "Field validation failed");
+        List<? extends org.springframework.context.MessageSourceResolvable> errors = List.of(objectError);
+        
+        when(exception.getAllErrors()).thenAnswer(invocation -> errors);
+        
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler
+                .handleHandlerMethodValidation(exception, webRequest);
+        
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(ErrorResponseFactory.VALIDATION_FAILED, response.getBody().getCode());
+        assertTrue(response.getBody().getMessage().contains("Validation failed"));
+    }
+
+    @Test
+    void handleHandlerMethodValidation_NoErrors_ReturnsGenericMessage() {
+        HandlerMethodValidationException exception = mock(HandlerMethodValidationException.class);
+        
+        when(exception.getAllErrors()).thenReturn(Collections.emptyList());
+        
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler
+                .handleHandlerMethodValidation(exception, webRequest);
+        
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Validation failed", response.getBody().getMessage());
     }
 
     @Test
@@ -170,5 +219,40 @@ class GlobalExceptionHandlerTest {
                 .handleAuthenticationException(authEx, webRequest);
         assertNotNull(authResponse.getBody().getCode());
         assertNotNull(authResponse.getBody().getMessage());
+    }
+
+    @Test
+    void handleMethodArgumentTypeMismatch_NonEnumType_ReturnsBasicMessage() {
+        org.springframework.web.method.annotation.MethodArgumentTypeMismatchException exception = 
+                mock(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class);
+        
+        when(exception.getName()).thenReturn("id");
+        when(exception.getRequiredType()).thenReturn(null);
+        
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler
+                .handleMethodArgumentTypeMismatch(exception, webRequest);
+        
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().getMessage().contains("Invalid value for parameter 'id'"));
+        assertFalse(response.getBody().getMessage().contains("Valid values are"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void handleMethodArgumentTypeMismatch_NonEnumRequiredType_ReturnsBasicMessage() {
+        org.springframework.web.method.annotation.MethodArgumentTypeMismatchException exception = 
+                mock(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class);
+        
+        when(exception.getName()).thenReturn("page");
+        when(exception.getRequiredType()).thenReturn((Class) Integer.class);
+        
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler
+                .handleMethodArgumentTypeMismatch(exception, webRequest);
+        
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().getMessage().contains("Invalid value for parameter 'page'"));
+        assertFalse(response.getBody().getMessage().contains("Valid values are"));
     }
 }

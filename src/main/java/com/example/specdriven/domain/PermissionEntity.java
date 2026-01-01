@@ -1,6 +1,10 @@
 package com.example.specdriven.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
@@ -11,6 +15,10 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "permissions")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PermissionEntity {
 
     @Id
@@ -22,39 +30,4 @@ public class PermissionEntity {
 
     @Column(name = "description")
     private String description;
-
-    // Constructors
-    public PermissionEntity() {
-    }
-
-    public PermissionEntity(UUID id, String permission, String description) {
-        this.id = id;
-        this.permission = permission;
-        this.description = description;
-    }
-
-    // Getters and Setters
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getPermission() {
-        return permission;
-    }
-
-    public void setPermission(String permission) {
-        this.permission = permission;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

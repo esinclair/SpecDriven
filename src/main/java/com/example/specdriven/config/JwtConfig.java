@@ -1,5 +1,7 @@
 package com.example.specdriven.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "jwt")
+@Getter
+@Setter
 public class JwtConfig {
 
     /**
@@ -23,21 +27,4 @@ public class JwtConfig {
      * Default: 86400000 ms = 24 hours
      */
     private long expirationMs = 86400000L;
-
-    // Getters and Setters
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    public long getExpirationMs() {
-        return expirationMs;
-    }
-
-    public void setExpirationMs(long expirationMs) {
-        this.expirationMs = expirationMs;
-    }
 }

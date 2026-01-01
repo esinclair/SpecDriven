@@ -6,6 +6,7 @@ import com.example.specdriven.domain.UserEntity;
 import com.example.specdriven.domain.UserRoleEntity;
 import com.example.specdriven.exception.ConflictException;
 import com.example.specdriven.exception.ResourceNotFoundException;
+import com.example.specdriven.exception.ValidationException;
 import com.example.specdriven.mapper.UserMapper;
 import com.example.specdriven.repository.RoleRepository;
 import com.example.specdriven.repository.UserRepository;
@@ -16,13 +17,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -310,5 +313,449 @@ class UserServiceTest {
                 () -> userService.deleteUser(userId));
         assertTrue(exception.getMessage().contains("User not found"));
         verify(userRepository, never()).deleteById(any());
+    }
+
+    // =====================================
+    // listUsers tests
+    // =====================================
+
+    @Test
+    void listUsers_NullPage_ThrowsValidationException() {
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> userService.listUsers(null, 10, null, null, null, null));
+        assertTrue(exception.getMessage().contains("Page must be >= 1"));
+    }
+
+    @Test
+    void listUsers_ZeroPage_ThrowsValidationException() {
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> userService.listUsers(0, 10, null, null, null, null));
+        assertTrue(exception.getMessage().contains("Page must be >= 1"));
+    }
+
+    @Test
+    void listUsers_NegativePage_ThrowsValidationException() {
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> userService.listUsers(-1, 10, null, null, null, null));
+        assertTrue(exception.getMessage().contains("Page must be >= 1"));
+    }
+
+    @Test
+    void listUsers_NullPageSize_ThrowsValidationException() {
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> userService.listUsers(1, null, null, null, null, null));
+        assertTrue(exception.getMessage().contains("Page size must be >= 1"));
+    }
+
+    @Test
+    void listUsers_ZeroPageSize_ThrowsValidationException() {
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> userService.listUsers(1, 0, null, null, null, null));
+        assertTrue(exception.getMessage().contains("Page size must be >= 1"));
+    }
+
+    @Test
+    void listUsers_NegativePageSize_ThrowsValidationException() {
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> userService.listUsers(1, -1, null, null, null, null));
+        assertTrue(exception.getMessage().contains("Page size must be >= 1"));
+    }
+
+    @Test
+    void listUsers_ExceedsMaxPageSize_ThrowsValidationException() {
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> userService.listUsers(1, 101, null, null, null, null));
+        assertTrue(exception.getMessage().contains("Page size must be <= 100"));
+    }
+
+    @Test
+    void listUsers_ValidParams_ReturnsUserPage() {
+        // Given
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(testUserEntity),
+                PageRequest.of(0, 10),
+                1
+        );
+        when(userRepository.findAll(any(Pageable.class))).thenReturn(entityPage);
+        when(userRoleRepository.findByUserId(any())).thenReturn(Collections.emptyList());
+        when(userMapper.toDto(any(UserEntity.class), anyList())).thenReturn(testUserDto);
+
+        // When
+        UserPage result = userService.listUsers(1, 10, null, null, null, null);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.getPage());
+        assertEquals(10, result.getPageSize());
+    }
+
+    @Test
+    void listUsers_WithRoleFilter_ReturnsFilteredResults() {
+        // Given
+        UUID roleId = UUID.randomUUID();
+        RoleEntity role = new RoleEntity(roleId, "USER", "User role");
+        UserRoleEntity userRole = new UserRoleEntity(testUserEntity.getId(), roleId, LocalDateTime.now());
+        
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(testUserEntity),
+                PageRequest.of(0, 10),
+                1
+        );
+        
+        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(userRoleRepository.findByRoleId(roleId)).thenReturn(List.of(userRole));
+        when(userRepository.findByIdIn(anyList(), any(Pageable.class))).thenReturn(entityPage);
+        when(userRoleRepository.findByUserId(any())).thenReturn(Collections.emptyList());
+        when(userMapper.toDto(any(UserEntity.class), anyList())).thenReturn(testUserDto);
+
+        // When
+        UserPage result = userService.listUsers(1, 10, null, null, null, RoleName.USER);
+
+        // Then
+        assertNotNull(result);
+    }
+
+    @Test
+    void listUsers_WithNonExistentRole_ReturnsEmptyPage() {
+        // Given
+        when(roleRepository.findByRoleName("ADMIN")).thenReturn(Optional.empty());
+
+        // When
+        UserPage result = userService.listUsers(1, 10, null, null, null, RoleName.ADMIN);
+
+        // Then
+        assertNotNull(result);
+        assertTrue(result.getItems().isEmpty());
+    }
+
+    @Test
+    void listUsers_WithRoleAndAdditionalFilters_AppliesFilters() {
+        // Given
+        UUID roleId = UUID.randomUUID();
+        RoleEntity role = new RoleEntity(roleId, "USER", "User role");
+        UserRoleEntity userRole = new UserRoleEntity(testUserEntity.getId(), roleId, LocalDateTime.now());
+        
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(testUserEntity),
+                PageRequest.of(0, 10),
+                1
+        );
+        
+        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(userRoleRepository.findByRoleId(roleId)).thenReturn(List.of(userRole));
+        when(userRepository.findByIdIn(anyList(), any(Pageable.class))).thenReturn(entityPage);
+        when(userRoleRepository.findByUserId(any())).thenReturn(Collections.emptyList());
+        when(userMapper.toDto(any(UserEntity.class), anyList())).thenReturn(testUserDto);
+
+        // When - with username filter that matches
+        UserPage result = userService.listUsers(1, 10, "testuser", null, null, RoleName.USER);
+
+        // Then
+        assertNotNull(result);
+    }
+
+    @Test
+    void listUsers_WithRoleAndNonMatchingFilters_ReturnsEmptyResults() {
+        // Given
+        UUID roleId = UUID.randomUUID();
+        RoleEntity role = new RoleEntity(roleId, "USER", "User role");
+        UserRoleEntity userRole = new UserRoleEntity(testUserEntity.getId(), roleId, LocalDateTime.now());
+        
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(testUserEntity),
+                PageRequest.of(0, 10),
+                1
+        );
+        
+        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(userRoleRepository.findByRoleId(roleId)).thenReturn(List.of(userRole));
+        when(userRepository.findByIdIn(anyList(), any(Pageable.class))).thenReturn(entityPage);
+
+        // When - with username filter that doesn't match
+        UserPage result = userService.listUsers(1, 10, "nonexistent", null, null, RoleName.USER);
+
+        // Then
+        assertNotNull(result);
+        assertTrue(result.getItems().isEmpty());
+    }
+
+    @Test
+    void listUsers_WithUsernameFilter_CallsCorrectRepository() {
+        // Given
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Collections.emptyList(), PageRequest.of(0, 10), 0);
+        when(userRepository.findByUsername(anyString(), any(Pageable.class))).thenReturn(entityPage);
+
+        // When
+        userService.listUsers(1, 10, "testuser", null, null, null);
+
+        // Then
+        verify(userRepository).findByUsername(eq("testuser"), any(Pageable.class));
+    }
+
+    @Test
+    void listUsers_WithEmailFilter_CallsCorrectRepository() {
+        // Given
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Collections.emptyList(), PageRequest.of(0, 10), 0);
+        when(userRepository.findByEmailAddress(anyString(), any(Pageable.class))).thenReturn(entityPage);
+
+        // When
+        userService.listUsers(1, 10, null, "test@example.com", null, null);
+
+        // Then
+        verify(userRepository).findByEmailAddress(eq("test@example.com"), any(Pageable.class));
+    }
+
+    @Test
+    void listUsers_WithNameFilter_CallsCorrectRepository() {
+        // Given
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Collections.emptyList(), PageRequest.of(0, 10), 0);
+        when(userRepository.findByNameContainingIgnoreCase(anyString(), any(Pageable.class))).thenReturn(entityPage);
+
+        // When
+        userService.listUsers(1, 10, null, null, "Test", null);
+
+        // Then
+        verify(userRepository).findByNameContainingIgnoreCase(eq("Test"), any(Pageable.class));
+    }
+
+    @Test
+    void listUsers_WithUsernameAndEmailFilters_CallsCorrectRepository() {
+        // Given
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Collections.emptyList(), PageRequest.of(0, 10), 0);
+        when(userRepository.findByUsernameAndEmailAddress(anyString(), anyString(), any(Pageable.class)))
+                .thenReturn(entityPage);
+
+        // When
+        userService.listUsers(1, 10, "testuser", "test@example.com", null, null);
+
+        // Then
+        verify(userRepository).findByUsernameAndEmailAddress(eq("testuser"), eq("test@example.com"), any(Pageable.class));
+    }
+
+    @Test
+    void listUsers_WithUsernameAndNameFilters_CallsCorrectRepository() {
+        // Given
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Collections.emptyList(), PageRequest.of(0, 10), 0);
+        when(userRepository.findByUsernameAndNameContainingIgnoreCase(anyString(), anyString(), any(Pageable.class)))
+                .thenReturn(entityPage);
+
+        // When
+        userService.listUsers(1, 10, "testuser", null, "Test", null);
+
+        // Then
+        verify(userRepository).findByUsernameAndNameContainingIgnoreCase(eq("testuser"), eq("Test"), any(Pageable.class));
+    }
+
+    @Test
+    void listUsers_WithEmailAndNameFilters_CallsCorrectRepository() {
+        // Given
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Collections.emptyList(), PageRequest.of(0, 10), 0);
+        when(userRepository.findByEmailAddressAndNameContainingIgnoreCase(anyString(), anyString(), any(Pageable.class)))
+                .thenReturn(entityPage);
+
+        // When
+        userService.listUsers(1, 10, null, "test@example.com", "Test", null);
+
+        // Then
+        verify(userRepository).findByEmailAddressAndNameContainingIgnoreCase(eq("test@example.com"), eq("Test"), any(Pageable.class));
+    }
+
+    @Test
+    void listUsers_WithAllFilters_CallsCorrectRepository() {
+        // Given
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Collections.emptyList(), PageRequest.of(0, 10), 0);
+        when(userRepository.findByUsernameAndEmailAddressAndNameContainingIgnoreCase(
+                anyString(), anyString(), anyString(), any(Pageable.class)))
+                .thenReturn(entityPage);
+
+        // When
+        userService.listUsers(1, 10, "testuser", "test@example.com", "Test", null);
+
+        // Then
+        verify(userRepository).findByUsernameAndEmailAddressAndNameContainingIgnoreCase(
+                eq("testuser"), eq("test@example.com"), eq("Test"), any(Pageable.class));
+    }
+
+    @Test
+    void listUsers_WithRoleButNoUsersWithRole_ReturnsEmptyPage() {
+        // Given
+        UUID roleId = UUID.randomUUID();
+        RoleEntity role = new RoleEntity(roleId, "ADMIN", "Admin role");
+        
+        when(roleRepository.findByRoleName("ADMIN")).thenReturn(Optional.of(role));
+        when(userRoleRepository.findByRoleId(roleId)).thenReturn(Collections.emptyList());
+
+        // When
+        UserPage result = userService.listUsers(1, 10, null, null, null, RoleName.ADMIN);
+
+        // Then
+        assertNotNull(result);
+        assertTrue(result.getItems().isEmpty());
+    }
+
+    @Test
+    void updateUser_ChangingEmailToOwnedEmail_DoesNotThrowConflict() {
+        // Given - test the validateEmailUniqueness excludeUserId branch
+        UUID userId = testUserEntity.getId();
+
+        UpdateUserRequest updateEmailRequest = new UpdateUserRequest();
+        updateEmailRequest.setEmailAddress("new@example.com");
+
+        UserEntity updatedEntity = new UserEntity();
+        updatedEntity.setId(userId);
+        updatedEntity.setEmailAddress("new@example.com");
+
+        User updatedDto = new User();
+        updatedDto.setId(userId);
+        updatedDto.setRoles(Collections.emptyList());
+
+        // The email "new@example.com" exists but belongs to THIS user (same ID)
+        UserEntity sameUser = new UserEntity();
+        sameUser.setId(userId); // Same ID as the user being updated
+        sameUser.setEmailAddress("new@example.com");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUserEntity));
+        when(userRepository.findByEmailAddress("new@example.com")).thenReturn(Optional.of(sameUser));
+        when(userMapper.updateEntity(updateEmailRequest, testUserEntity)).thenReturn(updatedEntity);
+        when(userRepository.save(updatedEntity)).thenReturn(updatedEntity);
+        when(userRoleRepository.findByUserId(userId)).thenReturn(Collections.emptyList());
+        when(userMapper.toDto(updatedEntity, Collections.emptyList())).thenReturn(updatedDto);
+
+        // When
+        User result = userService.updateUser(userId, updateEmailRequest);
+
+        // Then - should NOT throw conflict, because the email belongs to the same user
+        assertNotNull(result);
+    }
+
+    @Test
+    void listUsers_WithEmptyStrings_UsesCorrectFilters() {
+        // Given - empty strings should NOT count as filters
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Collections.emptyList(), PageRequest.of(0, 10), 0);
+        when(userRepository.findAll(any(Pageable.class))).thenReturn(entityPage);
+
+        // When - empty strings should be treated as null (no filter)
+        userService.listUsers(1, 10, "", "", "", null);
+
+        // Then
+        verify(userRepository).findAll(any(Pageable.class));
+        verify(userRepository, never()).findByUsername(anyString(), any(Pageable.class));
+    }
+
+    @Test
+    void listUsers_WithRoleAndEmailFilter_FiltersCorrectly() {
+        // Given - tests email filter branch in matchesFilters
+        UUID roleId = UUID.randomUUID();
+        RoleEntity role = new RoleEntity(roleId, "USER", "User role");
+        UserRoleEntity userRole = new UserRoleEntity(testUserEntity.getId(), roleId, LocalDateTime.now());
+        
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(testUserEntity),
+                PageRequest.of(0, 10),
+                1
+        );
+        
+        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(userRoleRepository.findByRoleId(roleId)).thenReturn(List.of(userRole));
+        when(userRepository.findByIdIn(anyList(), any(Pageable.class))).thenReturn(entityPage);
+
+        // When - with email filter that doesn't match
+        UserPage result = userService.listUsers(1, 10, null, "other@example.com", null, RoleName.USER);
+
+        // Then
+        assertNotNull(result);
+        assertTrue(result.getItems().isEmpty());
+    }
+
+    @Test
+    void listUsers_WithRoleAndNameFilter_FiltersCorrectly() {
+        // Given - tests name filter branch in matchesFilters
+        UUID roleId = UUID.randomUUID();
+        RoleEntity role = new RoleEntity(roleId, "USER", "User role");
+        UserRoleEntity userRole = new UserRoleEntity(testUserEntity.getId(), roleId, LocalDateTime.now());
+        
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(testUserEntity),
+                PageRequest.of(0, 10),
+                1
+        );
+        
+        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(userRoleRepository.findByRoleId(roleId)).thenReturn(List.of(userRole));
+        when(userRepository.findByIdIn(anyList(), any(Pageable.class))).thenReturn(entityPage);
+
+        // When - with name filter that doesn't match
+        UserPage result = userService.listUsers(1, 10, null, null, "NonExistent", RoleName.USER);
+
+        // Then
+        assertNotNull(result);
+        assertTrue(result.getItems().isEmpty());
+    }
+
+    @Test
+    void listUsers_WithRoleAndMatchingName_ReturnsResults() {
+        // Given - tests name filter branch in matchesFilters when it matches
+        UUID roleId = UUID.randomUUID();
+        RoleEntity role = new RoleEntity(roleId, "USER", "User role");
+        UserRoleEntity userRole = new UserRoleEntity(testUserEntity.getId(), roleId, LocalDateTime.now());
+        
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(testUserEntity),
+                PageRequest.of(0, 10),
+                1
+        );
+        
+        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(userRoleRepository.findByRoleId(roleId)).thenReturn(List.of(userRole));
+        when(userRepository.findByIdIn(anyList(), any(Pageable.class))).thenReturn(entityPage);
+        when(userRoleRepository.findByUserId(any())).thenReturn(Collections.emptyList());
+        when(userMapper.toDto(any(UserEntity.class), anyList())).thenReturn(testUserDto);
+
+        // When - with name filter that matches (case-insensitive)
+        UserPage result = userService.listUsers(1, 10, null, null, "test", RoleName.USER);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.getItems().size());
+    }
+
+    @Test
+    void listUsers_WithRoleAndNullUserName_FiltersCorrectly() {
+        // Given - tests the null name branch in matchesFilters
+        UUID roleId = UUID.randomUUID();
+        RoleEntity role = new RoleEntity(roleId, "USER", "User role");
+        
+        UserEntity userWithNullName = new UserEntity();
+        userWithNullName.setId(UUID.randomUUID());
+        userWithNullName.setUsername("noname");
+        userWithNullName.setEmailAddress("noname@example.com");
+        userWithNullName.setName(null); // null name
+        
+        UserRoleEntity userRole = new UserRoleEntity(userWithNullName.getId(), roleId, LocalDateTime.now());
+        
+        Page<UserEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                List.of(userWithNullName),
+                PageRequest.of(0, 10),
+                1
+        );
+        
+        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(userRoleRepository.findByRoleId(roleId)).thenReturn(List.of(userRole));
+        when(userRepository.findByIdIn(anyList(), any(Pageable.class))).thenReturn(entityPage);
+
+        // When - with name filter, user has null name
+        UserPage result = userService.listUsers(1, 10, null, null, "test", RoleName.USER);
+
+        // Then - should be filtered out
+        assertNotNull(result);
+        assertTrue(result.getItems().isEmpty());
     }
 }
