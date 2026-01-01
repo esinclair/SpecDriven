@@ -239,6 +239,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void handleMethodArgumentTypeMismatch_NonEnumRequiredType_ReturnsBasicMessage() {
         org.springframework.web.method.annotation.MethodArgumentTypeMismatchException exception = 
                 mock(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class);
