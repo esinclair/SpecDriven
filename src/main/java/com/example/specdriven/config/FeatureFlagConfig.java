@@ -1,5 +1,7 @@
 package com.example.specdriven.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "feature-flag")
+@Getter
+@Setter
 public class FeatureFlagConfig {
 
     /**
@@ -27,13 +31,4 @@ public class FeatureFlagConfig {
      * - /ping endpoint is NOT affected (always accessible)
      */
     private boolean usersApi = false;
-
-    // Getters and Setters
-    public boolean isUsersApi() {
-        return usersApi;
-    }
-
-    public void setUsersApi(boolean usersApi) {
-        this.usersApi = usersApi;
-    }
 }

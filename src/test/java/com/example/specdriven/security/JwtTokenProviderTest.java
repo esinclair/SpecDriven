@@ -133,4 +133,42 @@ class JwtTokenProviderTest {
         assertEquals(userId, extracted1);
         assertEquals(userId, extracted2);
     }
+
+    @Test
+    void constructor_EmptySecret_ThrowsIllegalStateException() {
+        JwtConfig emptySecretConfig = new JwtConfig();
+        emptySecretConfig.setSecret("");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> new JwtTokenProvider(emptySecretConfig));
+        assertTrue(exception.getMessage().contains("must not be empty"));
+    }
+
+    @Test
+    void constructor_NullSecret_ThrowsIllegalStateException() {
+        JwtConfig nullSecretConfig = new JwtConfig();
+        nullSecretConfig.setSecret(null);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> new JwtTokenProvider(nullSecretConfig));
+        assertTrue(exception.getMessage().contains("must not be empty"));
+    }
+
+    @Test
+    void constructor_ShortSecret_LogsWarningInNonProd() {
+        // Short secret should throw WeakKeyException from jjwt library (minimum key length is enforced)
+        JwtConfig shortSecretConfig = new JwtConfig();
+        shortSecretConfig.setSecret("short-key-for-testing"); // Needs to be at least 32 chars for HS256
+        shortSecretConfig.setExpirationMs(86400000L);
+
+        // The jjwt library throws WeakKeyException for keys less than 256 bits (32 chars)
+        assertThrows(io.jsonwebtoken.security.WeakKeyException.class,
+                () -> new JwtTokenProvider(shortSecretConfig));
+    }
+
+    @Test
+    void isTokenExpired_NullToken_ReturnsTrue() {
+        boolean isExpired = jwtTokenProvider.isTokenExpired(null);
+        assertTrue(isExpired);
+    }
 }

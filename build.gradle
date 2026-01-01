@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.9'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.openapi.generator' version '7.14.0'
+    id 'jacoco'
 }
 
 group = 'com.example'
@@ -36,6 +37,12 @@ dependencies {
 
     // Flyway for database migrations
     implementation 'org.flywaydb:flyway-core'
+
+    // Lombok for boilerplate reduction
+    compileOnly 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+    testCompileOnly 'org.projectlombok:lombok:1.18.36'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 
     // Optional but handy if you later want to serve docs at runtime
     // implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
@@ -142,6 +149,53 @@ tasks.named('processTestResources') {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+// JaCoCo configuration for code coverage
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                // Exclude generated OpenAPI code from coverage
+                '**/api/model/**',
+                '**/api/*Api.class'
+            ])
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                minimum = 0.90
+            }
+            limit {
+                counter = 'BRANCH'
+                minimum = 0.90
+            }
+        }
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                // Exclude generated OpenAPI code from coverage
+                '**/api/model/**',
+                '**/api/*Api.class'
+            ])
+        }))
+    }
+}
+
+tasks.named('check') {
+    dependsOn jacocoTestCoverageVerification
 }
 
 // Also remove generated source roots on clean, but preserve ApiUtil.java
