@@ -294,6 +294,20 @@ As a system administrator, I want to control feature availability via configurat
 - **FR-051**: The health check endpoint MUST NOT require authentication.
 - **FR-052**: The login endpoint MUST NOT require authentication.
 
+#### Authorization for User Management
+
+- **FR-053**: The system MUST implement fine-grained, operation-level permissions for user management operations using a fixed set of permission identifiers: `USER_CREATE`, `USER_READ`, `USER_UPDATE`, `USER_DELETE`, `USER_LIST`, and `USER_ROLE_MANAGE`.
+- **FR-054**: Permissions MUST be persisted in a `Permission` table and exposed to the authorization layer as authorities, so that Spring Security expressions such as `hasAuthority('USER_CREATE')` can be evaluated for protected endpoints.
+- **FR-055**: The system MUST map `Role` entities to one or more `Permission` entities, so that roles act as aggregates of permissions and users inherit permissions transitively via their assigned roles.
+- **FR-056**: The `POST /users` (createUser) operation MUST require the `USER_CREATE` permission; authorization checks MUST be expressed via Spring Security authority evaluation for this permission.
+- **FR-057**: The `GET /users/{userId}` (getUserById) operation MUST require the `USER_READ` permission.
+- **FR-058**: The `PUT /users/{userId}` and `PATCH /users/{userId}` (updateUser) operations MUST require the `USER_UPDATE` permission.
+- **FR-059**: The `DELETE /users/{userId}` (deleteUser) operation MUST require the `USER_DELETE` permission.
+- **FR-060A**: The `GET /users` (listUsers) operation MUST require the `USER_LIST` permission.
+- **FR-060B**: The `POST /users/{userId}/roles/{roleName}` (assignRoleToUser) operation MUST require the `USER_ROLE_MANAGE` permission.
+- **FR-060C**: The `DELETE /users/{userId}/roles/{roleName}` (removeRoleFromUser) operation MUST require the `USER_ROLE_MANAGE` permission.
+- **FR-060D**: The OpenAPI contract and any accompanying documentation MUST clearly describe the required permission for each Users API operation so that client teams and administrators understand the authorization model.
+
 #### User Management - Create
 
 - **FR-060**: The system MUST provide an endpoint to create users.
@@ -390,9 +404,9 @@ As a system administrator, I want to control feature availability via configurat
 
 - **User**: Represents a person or principal in the system. Required fields: `username` (string), `name` (string), `password` (string, write-only), `emailAddress` (string, unique). System-assigned fields: `id` (unique identifier). Related data: `roles` (list of assigned Role objects).
 
-- **Role**: Represents a named permission group that can be assigned to users. Fields: `roleName` (string from predefined set), `permissions` (list of Permission strings). Roles are predefined by the system and not created dynamically via the API.
+- **Role**: Represents a named permission group that can be assigned to users. Fields: `roleName` (string from predefined set), `permissions` (list of Permission objects or identifiers). Roles are predefined by the system and not created dynamically via the API. Each Role aggregates multiple `Permission` entries, and users obtain effective permissions through their assigned roles.
 
-- **Permission**: Represents a specific capability or access right. Represented as a string value within a Role's permissions list. Permissions are defined as part of the role definitions.
+- **Permission**: Represents a specific capability or access right that is persisted in the system. Fields: `name` (string identifier such as `USER_CREATE`, `USER_READ`, `USER_UPDATE`, `USER_DELETE`, `USER_LIST`, `USER_ROLE_MANAGE`). Permissions are stored in a dedicated `Permission` table and are linked to `Role` entities; at runtime each permission is exposed as an authority that can be evaluated by Spring Security expressions (for example, `hasAuthority('USER_CREATE')`).
 
 - **LoginRequest**: Request payload for authentication. Required fields: `username` (string), `password` (string).
 
@@ -401,6 +415,20 @@ As a system administrator, I want to control feature availability via configurat
 - **ErrorResponse**: Standard error payload returned for all 4xx and 5xx responses. Required fields: `code` (string, stable error identifier), `message` (string, human-readable safe description). Optional fields: `details` (object, additional diagnostic information that clients may ignore).
 
 - **PagedResult**: Response wrapper for paginated list operations. Fields: `items` (array of user objects for current page), `page` (integer, current page number), `pageSize` (integer, number of items per page), `totalCount` (integer, total number of items across all pages), pagination navigation information.
+
+## Authorization Rules for Users API
+
+The following table summarizes the required permissions for each Users-related endpoint. All listed endpoints are also subject to authentication and feature flag requirements defined elsewhere in this specification.
+
+| Endpoint                                   | HTTP Method | Operation Name        | Required Permission  |
+|--------------------------------------------|-------------|-----------------------|----------------------|
+| `/users`                                   | POST        | createUser            | `USER_CREATE`        |
+| `/users/{userId}`                          | GET         | getUserById           | `USER_READ`          |
+| `/users/{userId}`                          | PUT/PATCH   | updateUser            | `USER_UPDATE`        |
+| `/users/{userId}`                          | DELETE      | deleteUser            | `USER_DELETE`        |
+| `/users`                                   | GET         | listUsers             | `USER_LIST`          |
+| `/users/{userId}/roles/{roleName}`        | POST        | assignRoleToUser      | `USER_ROLE_MANAGE`   |
+| `/users/{userId}/roles/{roleName}`        | DELETE      | removeRoleFromUser    | `USER_ROLE_MANAGE`   |
 
 ## Success Criteria *(mandatory)*
 
@@ -444,8 +472,8 @@ As a system administrator, I want to control feature availability via configurat
 - Email addresses are unique across all users and serve as a uniqueness constraint.
 - Usernames are required but uniqueness is not enforced (users may share usernames but not emails).
 - Roles are predefined by the system; the API does not provide endpoints to create, update, or delete role definitions.
-- The set of available roles includes at minimum: ADMIN, USER, GUEST (specific roles and permissions to be defined during implementation).
-- Permissions are associated with roles and not directly with users.
+- The set of available roles includes at minimum: ADMIN, USER, GUEST, and roles are configured to aggregate the permission identifiers `USER_CREATE`, `USER_READ`, `USER_UPDATE`, `USER_DELETE`, `USER_LIST`, and `USER_ROLE_MANAGE` as appropriate for each role.
+- Permissions are associated with roles and not directly with users, but at runtime effective permissions are evaluated per user via Spring Security authorities derived from role-permission mappings.
 - The system uses JWT bearer tokens for authentication; token format and signing details are implementation concerns.
 - Passwords are hashed before storage using industry-standard algorithms; plaintext passwords are never stored.
 - Password fields are write-only; they appear in create/update requests but never in responses.
@@ -462,7 +490,7 @@ As a system administrator, I want to control feature availability via configurat
 - The login endpoint is gated by the same feature flag as other user management endpoints.
 - Transient database connection failures are retryable and return **503**; validation and business logic errors are not retryable and return **4xx**.
 - The system does not implement rate limiting in the initial version; rate limiting may be added in future iterations.
-- The system does not implement authorization policies beyond authentication; all authenticated users can perform all operations.
+- The system enforces authorization using role-based aggregation of the explicit per-operation permissions defined in this specification; additional fine-grained authorization policies beyond these permissions are out of scope.
 - Token expiration time is configurable; expired tokens are rejected with **401** requiring re-authentication.
 - The system operates as a single monolithic application; no distributed components or microservices are involved.
 
@@ -505,5 +533,4 @@ The following items are explicitly out of scope for this specification:
 - API documentation UI or interactive documentation tools.
 - Client SDKs or libraries for consuming the API.
 - Deployment configuration, containerization, or infrastructure concerns.
-
 

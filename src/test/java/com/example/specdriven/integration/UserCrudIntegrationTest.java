@@ -2,6 +2,7 @@ package com.example.specdriven.integration;
 
 import com.example.specdriven.api.model.*;
 import com.example.specdriven.domain.UserEntity;
+import com.example.specdriven.integration.support.IntegrationTestHelper;
 import com.example.specdriven.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,9 @@ class UserCrudIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private IntegrationTestHelper testHelper;
+
     private static final String AUTH_USERNAME = "authuser";
     private static final String AUTH_PASSWORD = "AuthPassword123!";
     private static final String AUTH_EMAIL = "auth@example.com";
@@ -54,36 +58,8 @@ class UserCrudIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        // Create an auth user and get a token for authenticated requests
-        authToken = createAuthUserAndGetToken();
-    }
-
-    /**
-     * Create an auth user and return a valid JWT token.
-     */
-    private String createAuthUserAndGetToken() throws Exception {
-        // Create auth user directly in database
-        UserEntity authUser = new UserEntity();
-        authUser.setId(UUID.randomUUID());
-        authUser.setUsername(AUTH_USERNAME);
-        authUser.setName("Auth User");
-        authUser.setEmailAddress(AUTH_EMAIL);
-        authUser.setPasswordHash(passwordEncoder.encode(AUTH_PASSWORD));
-        authUser.setCreatedAt(LocalDateTime.now());
-        authUser.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(authUser);
-
-        // Login to get token
-        LoginRequest loginRequest = new LoginRequest(AUTH_USERNAME, AUTH_PASSWORD);
-        MvcResult result = mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        LoginResponse response = objectMapper.readValue(
-                result.getResponse().getContentAsString(), LoginResponse.class);
-        return response.getToken();
+        // Create an admin auth user and get a token for authenticated requests
+        authToken = testHelper.createAdminUserAndGetToken(mockMvc, AUTH_USERNAME, AUTH_PASSWORD, AUTH_EMAIL);
     }
 
     // ==========================================

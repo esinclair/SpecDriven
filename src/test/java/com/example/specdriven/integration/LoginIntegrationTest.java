@@ -5,6 +5,7 @@ import com.example.specdriven.api.model.LoginRequest;
 import com.example.specdriven.api.model.LoginResponse;
 import com.example.specdriven.api.model.User;
 import com.example.specdriven.domain.UserEntity;
+import com.example.specdriven.integration.support.IntegrationTestHelper;
 import com.example.specdriven.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,9 @@ class LoginIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private IntegrationTestHelper testHelper;
+
     private static final String TEST_USERNAME = "testuser";
     private static final String TEST_PASSWORD = "TestPassword123!";
     private static final String TEST_EMAIL = "test@example.com";
@@ -61,7 +65,7 @@ class LoginIntegrationTest {
     }
 
     /**
-     * Helper method to create a test user directly in the database.
+     * Helper method to create a test user directly in the database (without admin role).
      */
     private UserEntity createTestUser() {
         UserEntity user = new UserEntity();
@@ -76,22 +80,11 @@ class LoginIntegrationTest {
     }
 
     /**
-     * Helper method to get a valid auth token for a test user.
+     * Helper method to get a valid auth token for a test user with ADMIN role.
+     * Uses IntegrationTestHelper to create a user with proper permissions.
      */
     private String getAuthToken() throws Exception {
-        createTestUser();
-        
-        LoginRequest loginRequest = new LoginRequest(TEST_USERNAME, TEST_PASSWORD);
-        
-        MvcResult result = mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        LoginResponse response = objectMapper.readValue(
-                result.getResponse().getContentAsString(), LoginResponse.class);
-        return response.getToken();
+        return testHelper.createAdminUserAndGetToken(mockMvc, TEST_USERNAME, TEST_PASSWORD, TEST_EMAIL);
     }
 
     // ============================================

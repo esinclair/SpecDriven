@@ -6,6 +6,7 @@ import com.example.specdriven.service.RoleService;
 import com.example.specdriven.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -32,6 +33,7 @@ public class UsersController implements UsersApi {
      * @return 201 Created with the new User
      */
     @Override
+    @PreAuthorize("hasAuthority('USER_CREATE')")
     public ResponseEntity<User> createUser(CreateUserRequest createUserRequest) {
         User user = userService.createUser(createUserRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
@@ -44,6 +46,7 @@ public class UsersController implements UsersApi {
      * @return 200 OK with the User
      */
     @Override
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<User> getUserById(UUID userId) {
         User user = userService.getUserById(userId);
         return ResponseEntity.ok(user);
@@ -57,6 +60,7 @@ public class UsersController implements UsersApi {
      * @return 200 OK with the updated User
      */
     @Override
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
     public ResponseEntity<User> updateUser(UUID userId, UpdateUserRequest updateUserRequest) {
         User user = userService.updateUser(userId, updateUserRequest);
         return ResponseEntity.ok(user);
@@ -69,6 +73,7 @@ public class UsersController implements UsersApi {
      * @return 204 No Content
      */
     @Override
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     public ResponseEntity<Void> deleteUser(UUID userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
@@ -86,6 +91,7 @@ public class UsersController implements UsersApi {
      * @return 200 OK with paginated user list
      */
     @Override
+    @PreAuthorize("hasAuthority('USER_LIST')")
     public ResponseEntity<UserPage> listUsers(Integer page, Integer pageSize, String username,
                                               String emailAddress, String name, RoleName roleName) {
         UserPage userPage = userService.listUsers(page, pageSize, username, emailAddress, name, roleName);
@@ -100,6 +106,7 @@ public class UsersController implements UsersApi {
      * @return 204 No Content
      */
     @Override
+    @PreAuthorize("hasAuthority('USER_ROLE_MANAGE')")
     public ResponseEntity<Void> assignRoleToUser(UUID userId, RoleName roleName) {
         roleService.assignRole(userId, roleName);
         return ResponseEntity.noContent().build();
@@ -113,6 +120,7 @@ public class UsersController implements UsersApi {
      * @return 204 No Content
      */
     @Override
+    @PreAuthorize("hasAuthority('USER_ROLE_MANAGE')")
     public ResponseEntity<Void> removeRoleFromUser(UUID userId, RoleName roleName) {
         roleService.removeRole(userId, roleName);
         return ResponseEntity.noContent().build();

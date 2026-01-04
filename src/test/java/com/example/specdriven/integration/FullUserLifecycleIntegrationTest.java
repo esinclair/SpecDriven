@@ -1,8 +1,7 @@
 package com.example.specdriven.integration;
 
 import com.example.specdriven.api.model.*;
-import com.example.specdriven.domain.UserEntity;
-import com.example.specdriven.repository.UserRepository;
+import com.example.specdriven.integration.support.IntegrationTestHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,18 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -43,10 +39,7 @@ class FullUserLifecycleIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private IntegrationTestHelper testHelper;
 
     private static final String AUTH_USERNAME = "lifecycleauth";
     private static final String AUTH_PASSWORD = "AuthPassword123!";
@@ -56,30 +49,7 @@ class FullUserLifecycleIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        authToken = createAuthUserAndGetToken();
-    }
-
-    private String createAuthUserAndGetToken() throws Exception {
-        UserEntity authUser = new UserEntity();
-        authUser.setId(UUID.randomUUID());
-        authUser.setUsername(AUTH_USERNAME);
-        authUser.setName("Lifecycle Auth User");
-        authUser.setEmailAddress(AUTH_EMAIL);
-        authUser.setPasswordHash(passwordEncoder.encode(AUTH_PASSWORD));
-        authUser.setCreatedAt(LocalDateTime.now());
-        authUser.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(authUser);
-
-        LoginRequest loginRequest = new LoginRequest(AUTH_USERNAME, AUTH_PASSWORD);
-        MvcResult result = mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        LoginResponse response = objectMapper.readValue(
-                result.getResponse().getContentAsString(), LoginResponse.class);
-        return response.getToken();
+        authToken = testHelper.createAdminUserAndGetToken(mockMvc, AUTH_USERNAME, AUTH_PASSWORD, AUTH_EMAIL);
     }
 
     /**
@@ -126,8 +96,10 @@ class FullUserLifecycleIntegrationTest {
         assertNotNull(newUserToken, "Token should not be null");
 
         // Step 3: Get user by ID (verify retrieval works)
+        // Note: New user has no permissions until role is assigned in step 4,
+        // so we use admin token to verify the user was created correctly
         mockMvc.perform(get("/users/" + userId)
-                .header("Authorization", "Bearer " + newUserToken))
+                .header("Authorization", "Bearer " + authToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userId.toString()))
                 .andExpect(jsonPath("$.username").value(newUsername));

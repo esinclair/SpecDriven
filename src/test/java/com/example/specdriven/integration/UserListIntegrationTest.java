@@ -4,6 +4,7 @@ import com.example.specdriven.api.model.*;
 import com.example.specdriven.domain.RoleEntity;
 import com.example.specdriven.domain.UserEntity;
 import com.example.specdriven.domain.UserRoleEntity;
+import com.example.specdriven.integration.support.IntegrationTestHelper;
 import com.example.specdriven.repository.RoleRepository;
 import com.example.specdriven.repository.UserRepository;
 import com.example.specdriven.repository.UserRoleRepository;
@@ -55,6 +56,9 @@ class UserListIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private IntegrationTestHelper testHelper;
+
     private static final String AUTH_USERNAME = "listauth";
     private static final String AUTH_PASSWORD = "AuthPassword123!";
     private static final String AUTH_EMAIL = "listauth@example.com";
@@ -63,30 +67,7 @@ class UserListIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        authToken = createAuthUserAndGetToken();
-    }
-
-    private String createAuthUserAndGetToken() throws Exception {
-        UserEntity authUser = new UserEntity();
-        authUser.setId(UUID.randomUUID());
-        authUser.setUsername(AUTH_USERNAME);
-        authUser.setName("List Auth User");
-        authUser.setEmailAddress(AUTH_EMAIL);
-        authUser.setPasswordHash(passwordEncoder.encode(AUTH_PASSWORD));
-        authUser.setCreatedAt(LocalDateTime.now());
-        authUser.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(authUser);
-
-        LoginRequest loginRequest = new LoginRequest(AUTH_USERNAME, AUTH_PASSWORD);
-        MvcResult result = mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        LoginResponse response = objectMapper.readValue(
-                result.getResponse().getContentAsString(), LoginResponse.class);
-        return response.getToken();
+        authToken = testHelper.createAdminUserAndGetToken(mockMvc, AUTH_USERNAME, AUTH_PASSWORD, AUTH_EMAIL);
     }
 
     private UserEntity createTestUser(String username, String name, String email) {

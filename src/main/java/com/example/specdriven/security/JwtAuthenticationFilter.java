@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -19,8 +21,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import com.example.specdriven.domain.PermissionEntity;
+import com.example.specdriven.repository.PermissionRepository;
 
 /**
  * JWT authentication filter that extracts and validates Bearer tokens from requests.
@@ -35,10 +40,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
+    private final PermissionRepository permissionRepository;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, ObjectMapper objectMapper) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
+                                   ObjectMapper objectMapper,
+                                   PermissionRepository permissionRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.objectMapper = objectMapper;
+        this.permissionRepository = permissionRepository;
     }
 
     @Override
@@ -73,8 +82,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // Valid token - set authentication in security context
             UUID userId = jwtTokenProvider.getUserIdFromToken(jwt);
+
+            // Load permissions for the user and map to Spring Security authorities
+            var permissions = permissionRepository.findByUserId(userId);
+            var authorities = permissions.stream()
+                    .map(PermissionEntity::getPermission)
+                    .map(SimpleGrantedAuthority::new)
+                    .map(GrantedAuthority.class::cast)
+                    .collect(Collectors.toList());
+
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(userId, null, authorities);
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 

@@ -153,6 +153,34 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle authorization denied exceptions (403 Forbidden).
+     * Client should not retry - user does not have required permissions.
+     */
+    @ExceptionHandler(org.springframework.security.authorization.AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(
+            org.springframework.security.authorization.AuthorizationDeniedException ex, WebRequest request) {
+        logger.warn("Access denied: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse();
+        error.setCode("FORBIDDEN");
+        error.setMessage("Access denied");
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * Handle Spring Security AccessDeniedException (403 Forbidden).
+     * Client should not retry - user does not have required permissions.
+     */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+            org.springframework.security.access.AccessDeniedException ex, WebRequest request) {
+        logger.warn("Access denied: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse();
+        error.setCode("FORBIDDEN");
+        error.setMessage("Access denied");
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    /**
      * Handle database access exceptions (503 Service Unavailable).
      * Client MAY retry with exponential backoff - transient failure.
      * Optionally includes Retry-After header.
